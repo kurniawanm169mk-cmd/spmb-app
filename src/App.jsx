@@ -1,0 +1,52 @@
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import LandingPage from './pages/LandingPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import AdminLoginPage from './pages/admin/AdminLoginPage';
+import StudentDashboard from './pages/student/StudentDashboard';
+import AdminDashboard from './pages/admin/AdminDashboard';
+
+const ProtectedRoute = ({ children, role }) => {
+    const { user, profile, loading } = useAuth();
+
+    if (loading) return <div>Loading...</div>;
+    if (!user) return <Navigate to="/login" />;
+
+    // Wait for profile to load if user is logged in
+    if (!profile) return <div>Loading Profile...</div>;
+
+    if (role && profile?.role !== role) return <Navigate to="/" />;
+
+    return children;
+};
+
+function App() {
+    return (
+        <AuthProvider>
+            <Router>
+                <Routes>
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/register" element={<RegisterPage />} />
+                    <Route path="/admin/login" element={<AdminLoginPage />} />
+
+                    <Route path="/student/*" element={
+                        <ProtectedRoute role="student">
+                            <StudentDashboard />
+                        </ProtectedRoute>
+                    } />
+
+                    <Route path="/admin/*" element={
+                        <ProtectedRoute role="admin">
+                            <AdminDashboard />
+                        </ProtectedRoute>
+                    } />
+                </Routes>
+            </Router>
+        </AuthProvider>
+    );
+}
+
+export default App;
