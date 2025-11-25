@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Upload, Trash2, FileText, CheckCircle } from 'lucide-react';
+import { Upload, Trash2, FileText, CheckCircle, Eye, File, Image } from 'lucide-react';
 
 export default function DocumentUpload({ registration, onUpdate }) {
     const [documents, setDocuments] = useState([]);
     const [uploading, setUploading] = useState(false);
+    const [error, setError] = useState('');
 
     // Define required documents
     const requiredDocs = [
@@ -13,6 +14,18 @@ export default function DocumentUpload({ registration, onUpdate }) {
         { id: 'ijazah', label: 'Ijazah / SKL (Jika ada)' },
         { id: 'foto', label: 'Pas Foto 3x4' }
     ];
+
+    // File validation constants
+    const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+    const ALLOWED_TYPES = [
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'application/pdf',
+        'application/msword', // .doc
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // .docx
+    ];
+    const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'];
 
     useEffect(() => {
         fetchDocuments();
@@ -26,9 +39,40 @@ export default function DocumentUpload({ registration, onUpdate }) {
         if (data) setDocuments(data);
     };
 
+    const validateFile = (file) => {
+        // Check file size
+        if (file.size > MAX_FILE_SIZE) {
+            return { valid: false, error: 'Ukuran file maksimal 2MB' };
+        }
+
+        // Check file type
+        const fileExt = file.name.split('.').pop().toLowerCase();
+        if (!ALLOWED_EXTENSIONS.includes(fileExt)) {
+            return { valid: false, error: 'Format file harus JPG, PNG, PDF, DOC, atau DOCX' };
+        }
+
+        // Additional MIME type check
+        if (!ALLOWED_TYPES.includes(file.type)) {
+            // Some browsers might not set the correct MIME type, so we rely more on extension
+            console.warn('MIME type mismatch, but extension is valid');
+        }
+
+        return { valid: true };
+    };
+
     const handleUpload = async (e, docType) => {
         const file = e.target.files[0];
         if (!file) return;
+
+        setError('');
+
+        // Validate file
+        const validation = validateFile(file);
+        if (!validation.valid) {
+            setError(validation.error);
+            e.target.value = ''; // Reset input
+            return;
+        }
 
         setUploading(true);
         try {
@@ -51,27 +95,28 @@ export default function DocumentUpload({ registration, onUpdate }) {
                 .insert([{
                     registration_id: registration.id,
                     document_type: docType,
-                    file_url: fileName
+                    file_url: fileName,
+                    file_name: file.name,
+                    file_size: file.size
                 }]);
 
             if (dbError) throw dbError;
 
             // If all required docs are uploaded, update status
-            // We'll check this after fetching updated docs
             await fetchDocuments();
             checkCompletion();
 
         } catch (err) {
             console.error('Error uploading:', err);
-            alert('Gagal upload: ' + err.message);
+            setError('Gagal upload: ' + err.message);
         } finally {
             setUploading(false);
+            e.target.value = ''; // Reset input
         }
     };
 
     const checkCompletion = async () => {
-        // Simple check: if we have at least 3 docs (assuming ijazah optional)
-        // Or just update status to 'documents_submitted' if it's not yet.
+        // Update status to 'documents_submitted' if not yet
         if (registration.status === 'payment_verified') {
             await supabase.from('registrations').update({ status: 'documents_submitted' }).eq('id', registration.id);
             onUpdate();
@@ -86,52 +131,123 @@ export default function DocumentUpload({ registration, onUpdate }) {
             fetchDocuments();
         } catch (err) {
             console.error('Error deleting:', err);
+            alert('Gagal menghapus dokumen');
         }
+    };
+
+    const handleViewDocument = async (filePath) => {
+        try {
+            const { data, error } = await supabase.storage
+                .from('private-docs')
+                .createSignedUrl(filePath, 3600); // Valid for 1 hour
+
+            if (error) throw error;
+
+            // Open in new tab
+            window.open(data.signedUrl, '_blank');
+        } catch (err) {
+            console.error('Error viewing document:', err);
+            alert('Gagal membuka dokumen');
+        }
+    };
+
+    const getFileIcon = (fileName) => {
+        if (!fileName) return <File size={24} />;
+        const ext = fileName.split('.').pop().toLowerCase();
+        if (['jpg', 'jpeg', 'png'].includes(ext)) {
+            return <Image size={24} />;
+        }
+        return <File size={24} />;
+    };
+
+    const formatFileSize = (bytes) => {
+        if (!bytes) return '-';
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
     };
 
     return (
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-            <h2 style={{ marginBottom: '1.5rem' }}>Upload Berkas</h2>
+            <h2 style={{ marginBottom: '1rem' }}>Upload Berkas</h2>
+            <p style={{ marginBottom: '1.5rem', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                Format: JPG, PNG, PDF, DOC, DOCX | Maksimal: 2MB per file
+            </p>
+
+            {error && (
+                <div style={{ backgroundColor: '#fef2f2', color: 'var(--error)', padding: '0.75rem', borderRadius: 'var(--radius-md)', marginBottom: '1rem', fontSize: '0.875rem' }}>
+                    {error}
+                </div>
+            )}
+
             <div style={{ display: 'grid', gap: '1.5rem' }}>
                 {requiredDocs.map((doc) => {
                     const uploadedDoc = documents.find(d => d.document_type === doc.id);
 
                     return (
-                        <div key={doc.id} className="card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <div style={{ padding: '0.75rem', backgroundColor: uploadedDoc ? '#ecfdf5' : '#f1f5f9', borderRadius: '50%', color: uploadedDoc ? 'var(--success)' : 'var(--text-secondary)' }}>
-                                    {uploadedDoc ? <CheckCircle size={24} /> : <FileText size={24} />}
+                        <div key={doc.id} className="card" style={{ padding: '1.5rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: uploadedDoc ? '1rem' : 0 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    <div style={{ padding: '0.75rem', backgroundColor: uploadedDoc ? '#ecfdf5' : '#f1f5f9', borderRadius: '50%', color: uploadedDoc ? 'var(--success)' : 'var(--text-secondary)' }}>
+                                        {uploadedDoc ? <CheckCircle size={24} /> : getFileIcon(uploadedDoc?.file_name)}
+                                    </div>
+                                    <div>
+                                        <h4 style={{ marginBottom: '0.25rem' }}>{doc.label}</h4>
+                                        {uploadedDoc ? (
+                                            <p style={{ fontSize: '0.875rem', color: 'var(--success)' }}>✓ Terupload</p>
+                                        ) : (
+                                            <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Belum diupload</p>
+                                        )}
+                                    </div>
                                 </div>
-                                <div>
-                                    <h4 style={{ marginBottom: '0.25rem' }}>{doc.label}</h4>
+
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
                                     {uploadedDoc ? (
-                                        <p style={{ fontSize: '0.875rem', color: 'var(--success)' }}>Terupload</p>
+                                        <>
+                                            <button
+                                                onClick={() => handleViewDocument(uploadedDoc.file_url)}
+                                                className="btn btn-outline"
+                                                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                                                title="Lihat Berkas"
+                                            >
+                                                <Eye size={18} />
+                                                <span style={{ display: 'inline-block' }}>Lihat</span>
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(uploadedDoc.id, uploadedDoc.file_url)}
+                                                className="btn btn-outline"
+                                                style={{ color: 'var(--error)', borderColor: 'var(--error)' }}
+                                                title="Hapus Berkas"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </>
                                     ) : (
-                                        <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Belum diupload</p>
+                                        <div>
+                                            <input
+                                                type="file"
+                                                id={`upload-${doc.id}`}
+                                                style={{ display: 'none' }}
+                                                accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+                                                onChange={(e) => handleUpload(e, doc.id)}
+                                                disabled={uploading}
+                                            />
+                                            <label htmlFor={`upload-${doc.id}`} className="btn btn-primary" style={{ cursor: uploading ? 'not-allowed' : 'pointer', opacity: uploading ? 0.7 : 1 }}>
+                                                <Upload size={18} /> Upload
+                                            </label>
+                                        </div>
                                     )}
                                 </div>
                             </div>
 
-                            <div>
-                                {uploadedDoc ? (
-                                    <button onClick={() => handleDelete(uploadedDoc.id, uploadedDoc.file_url)} className="btn btn-outline" style={{ color: 'var(--error)', borderColor: 'var(--error)' }}>
-                                        <Trash2 size={18} />
-                                    </button>
-                                ) : (
-                                    <div>
-                                        <input
-                                            type="file"
-                                            id={`upload-${doc.id}`}
-                                            style={{ display: 'none' }}
-                                            onChange={(e) => handleUpload(e, doc.id)}
-                                            disabled={uploading}
-                                        />
-                                        <label htmlFor={`upload-${doc.id}`} className="btn btn-primary" style={{ cursor: 'pointer' }}>
-                                            <Upload size={18} /> Upload
-                                        </label>
+                            {uploadedDoc && (
+                                <div style={{ paddingTop: '1rem', borderTop: '1px solid var(--border-color)', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                        <span>File: {uploadedDoc.file_name || 'N/A'}</span>
+                                        <span>Ukuran: {formatFileSize(uploadedDoc.file_size)}</span>
                                     </div>
-                                )}
-                            </div>
+                                </div>
+                            )}
                         </div>
                     );
                 })}
