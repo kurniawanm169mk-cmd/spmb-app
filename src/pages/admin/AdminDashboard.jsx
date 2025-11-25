@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { supabase } from '../../lib/supabase';
 import { LayoutDashboard, Users, Settings, LogOut, Palette } from 'lucide-react';
 import SchoolProfile from './SchoolProfile';
 import StudentList from './StudentList';
@@ -97,6 +98,8 @@ export default function AdminDashboard() {
     );
 }
 
+
+
 const DashboardOverview = () => {
     const [stats, setStats] = React.useState({ total: 0, pending: 0, accepted: 0 });
 
@@ -106,9 +109,14 @@ const DashboardOverview = () => {
 
     const fetchStats = async () => {
         try {
-            const { count: total } = await import('../../lib/supabase').then(m => m.supabase.from('registrations').select('*', { count: 'exact', head: true }));
-            const { count: pending } = await import('../../lib/supabase').then(m => m.supabase.from('registrations').select('*', { count: 'exact', head: true }).eq('status', 'payment_submitted'));
-            const { count: accepted } = await import('../../lib/supabase').then(m => m.supabase.from('registrations').select('*', { count: 'exact', head: true }).eq('status', 'passed'));
+            // Use static supabase client
+            const { count: total, error: err1 } = await supabase.from('registrations').select('*', { count: 'exact', head: true });
+            const { count: pending, error: err2 } = await supabase.from('registrations').select('*', { count: 'exact', head: true }).eq('status', 'payment_submitted');
+            const { count: accepted, error: err3 } = await supabase.from('registrations').select('*', { count: 'exact', head: true }).eq('status', 'passed');
+
+            if (err1) console.error('Error fetching total:', err1);
+            if (err2) console.error('Error fetching pending:', err2);
+            if (err3) console.error('Error fetching accepted:', err3);
 
             setStats({
                 total: total || 0,
@@ -119,6 +127,7 @@ const DashboardOverview = () => {
             console.error('Error fetching stats:', error);
         }
     };
+    // ...
 
     return (
         <div>

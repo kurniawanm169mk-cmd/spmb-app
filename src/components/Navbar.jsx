@@ -7,18 +7,17 @@ const Navbar = ({ schoolSettings }) => {
     const { school_name = 'SMPIT Ibnu Sina', logo_url } = schoolSettings || {};
 
     return (
-        <nav style={{
-            backgroundColor: 'var(--surface-color)',
-            borderBottom: '1px solid var(--border-color)',
+        <nav className="glass" style={{
             position: 'sticky',
             top: 0,
-            zIndex: 50
+            zIndex: 50,
+            borderBottom: '1px solid rgba(255, 255, 255, 0.5)'
         }}>
             <div className="container" style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                height: '4rem'
+                height: '4.5rem'
             }}>
                 {/* Logo & Brand */}
                 <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -45,11 +44,11 @@ const Navbar = ({ schoolSettings }) => {
                 </Link>
 
                 {/* Desktop Menu */}
-                <div className="desktop-menu" style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+                <div className="desktop-menu" style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
                     <Link to="/" className="nav-link" style={{ fontWeight: 500, color: 'var(--text-primary)' }}>Beranda</Link>
                     <a href="#info" className="nav-link" style={{ fontWeight: 500, color: 'var(--text-secondary)' }}>Informasi</a>
                     <a href="#contact" className="nav-link" style={{ fontWeight: 500, color: 'var(--text-secondary)' }}>Kontak</a>
-                    <Link to="/login" className="btn btn-primary">
+                    <Link to="/login" className="btn btn-primary" style={{ padding: '0.5rem 1.5rem' }}>
                         Masuk / Daftar
                     </Link>
                 </div>
@@ -66,17 +65,20 @@ const Navbar = ({ schoolSettings }) => {
 
             {/* Mobile Menu Dropdown */}
             {isOpen && (
-                <div style={{
+                <div className="glass" style={{
                     borderTop: '1px solid var(--border-color)',
                     padding: '1rem',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '1rem',
-                    backgroundColor: 'var(--surface-color)'
+                    position: 'absolute',
+                    top: '100%',
+                    left: 0,
+                    right: 0
                 }}>
-                    <Link to="/" onClick={() => setIsOpen(false)}>Beranda</Link>
-                    <a href="#info" onClick={() => setIsOpen(false)}>Informasi</a>
-                    <a href="#contact" onClick={() => setIsOpen(false)}>Kontak</a>
+                    <Link to="/" onClick={() => setIsOpen(false)} style={{ padding: '0.5rem' }}>Beranda</Link>
+                    <a href="#info" onClick={() => setIsOpen(false)} style={{ padding: '0.5rem' }}>Informasi</a>
+                    <a href="#contact" onClick={() => setIsOpen(false)} style={{ padding: '0.5rem' }}>Kontak</a>
                     <Link to="/login" className="btn btn-primary" onClick={() => setIsOpen(false)}>
                         Masuk / Daftar
                     </Link>

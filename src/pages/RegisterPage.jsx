@@ -3,10 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 import { UserPlus, ArrowLeft, Upload, CreditCard } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function RegisterPage() {
     const [email, setEmail] = useState('');
-
     const [fullName, setFullName] = useState('');
     const [phone, setPhone] = useState('');
     const [paymentFile, setPaymentFile] = useState(null);
@@ -105,19 +105,34 @@ export default function RegisterPage() {
 
     return (
         <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--bg-color)', padding: '2rem 1rem' }}>
-            <div className="card" style={{ width: '100%', maxWidth: '500px' }}>
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className="card glass"
+                style={{ width: '100%', maxWidth: '500px', border: '1px solid rgba(255,255,255,0.5)' }}
+            >
                 <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
-                    <div style={{ width: '48px', height: '48px', backgroundColor: '#ecfdf5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem', color: 'var(--primary-color)' }}>
-                        <UserPlus size={24} />
-                    </div>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Formulir Pendaftaran</h1>
+                    <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+                        style={{ width: '64px', height: '64px', backgroundColor: '#ecfdf5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem', color: 'var(--primary-color)' }}
+                    >
+                        <UserPlus size={32} />
+                    </motion.div>
+                    <h1 style={{ fontSize: '1.75rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>Formulir Pendaftaran</h1>
                     <p style={{ color: 'var(--text-secondary)' }}>Isi data diri dan lakukan pembayaran</p>
                 </div>
 
                 {error && (
-                    <div style={{ backgroundColor: '#fef2f2', color: 'var(--error)', padding: '0.75rem', borderRadius: 'var(--radius-md)', marginBottom: '1rem', fontSize: '0.875rem' }}>
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        style={{ backgroundColor: '#fef2f2', color: 'var(--error)', padding: '0.75rem', borderRadius: 'var(--radius-md)', marginBottom: '1rem', fontSize: '0.875rem' }}
+                    >
                         {error}
-                    </div>
+                    </motion.div>
                 )}
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -160,8 +175,6 @@ export default function RegisterPage() {
                             placeholder="nama@email.com"
                         />
                     </div>
-
-
 
                     <hr style={{ margin: '1rem 0', border: 'none', borderTop: '1px solid var(--border-color)' }} />
 
@@ -226,7 +239,7 @@ export default function RegisterPage() {
                         </Link>
                     </div>
                 </div>
-            </div>
+            </motion.div>
         </div>
     );
 }

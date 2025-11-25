@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Carousel from '../components/Carousel';
 import { Calendar, CheckCircle, FileText, Upload } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function LandingPage() {
     const [schoolSettings, setSchoolSettings] = useState(null);
@@ -17,7 +18,6 @@ export default function LandingPage() {
                 // Fetch School Settings
                 const { data: settings } = await supabase
                     .from('school_settings')
-                    .select('*')
                     .select('*')
                     .limit(1)
                     .maybeSingle();
@@ -65,91 +65,158 @@ export default function LandingPage() {
 
             <main style={{ flex: 1 }}>
                 {/* Hero Section */}
-                <section className="container" style={{ padding: '2rem 1rem' }}>
-                    <div style={{ textAlign: 'center', marginBottom: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <section className="container" style={{ padding: '4rem 1rem', textAlign: 'center' }}>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                        style={{ marginBottom: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+                    >
                         {schoolSettings?.logo_url && (
-                            <img
+                            <motion.img
+                                initial={{ scale: 0.8, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ delay: 0.2, duration: 0.5 }}
                                 src={schoolSettings.logo_url}
                                 alt="Logo Sekolah"
-                                style={{ width: '100px', height: '100px', objectFit: 'contain', marginBottom: '1rem' }}
+                                style={{ width: '120px', height: '120px', objectFit: 'contain', marginBottom: '1.5rem' }}
                             />
                         )}
-                        <h1 style={{ fontSize: '2.5rem', fontWeight: 'bold', color: 'var(--primary-color)', marginBottom: '0.5rem' }}>
+                        <h1 style={{ fontSize: '3rem', fontWeight: '800', color: 'var(--primary-color)', marginBottom: '1rem', letterSpacing: '-0.02em' }}>
                             {schoolSettings?.school_name || 'SMPIT Ibnu Sina'}
                         </h1>
-                        <p style={{ fontSize: '1.25rem', color: 'var(--text-secondary)' }}>
+                        <p style={{ fontSize: '1.25rem', color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto 2rem' }}>
                             {schoolSettings?.slogan || 'Generasi Islami, Unggul, Cerdas dan Berakhlak Mulia'}
                         </p>
 
                         {/* Registration Period */}
                         {schoolSettings?.registration_start_date && schoolSettings?.registration_end_date && (
-                            <div style={{ marginTop: '1.5rem', padding: '0.75rem 1.5rem', backgroundColor: '#f0f9ff', borderRadius: 'var(--radius-full)', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: 'var(--primary-color)', border: '1px solid #bae6fd' }}>
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: 0.4 }}
+                                style={{ padding: '0.75rem 1.5rem', backgroundColor: '#f0f9ff', borderRadius: 'var(--radius-full)', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: 'var(--primary-color)', border: '1px solid #bae6fd', boxShadow: 'var(--shadow-sm)' }}
+                            >
                                 <Calendar size={20} />
-                                <span style={{ fontWeight: 500 }}>
+                                <span style={{ fontWeight: 600 }}>
                                     Pendaftaran: {new Date(schoolSettings.registration_start_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long' })} - {new Date(schoolSettings.registration_end_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                                 </span>
-                            </div>
+                            </motion.div>
                         )}
-                    </div>
+                    </motion.div>
 
-                    <Carousel slides={carouselImages} />
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.6, duration: 0.6 }}
+                    >
+                        <Carousel slides={carouselImages} />
+                    </motion.div>
                 </section>
 
                 {/* Info / Steps Section */}
-                <section id="info" style={{ backgroundColor: 'white', padding: '4rem 0' }}>
+                <section id="info" style={{ backgroundColor: 'white', padding: '6rem 0' }}>
                     <div className="container">
-                        <h2 style={{ textAlign: 'center', marginBottom: '3rem', color: 'var(--text-primary)' }}>Alur Pendaftaran</h2>
+                        <motion.h2
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            style={{ textAlign: 'center', marginBottom: '4rem', color: 'var(--text-primary)', fontSize: '2.25rem', fontWeight: 'bold' }}
+                        >
+                            Alur Pendaftaran
+                        </motion.h2>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2.5rem' }}>
                             {/* Step 1 */}
-                            <div className="card" style={{ textAlign: 'center', padding: '2rem' }}>
-                                <div style={{ margin: '0 auto 1rem', width: '64px', height: '64px', backgroundColor: '#ecfdf5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary-color)' }}>
-                                    <FileText size={32} />
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.1 }}
+                                className="card"
+                                style={{ textAlign: 'center', padding: '2.5rem' }}
+                            >
+                                <div style={{ margin: '0 auto 1.5rem', width: '72px', height: '72px', backgroundColor: '#ecfdf5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary-color)' }}>
+                                    <FileText size={36} />
                                 </div>
-                                <h3 style={{ marginBottom: '0.5rem' }}>1. Daftar Akun</h3>
-                                <p style={{ color: 'var(--text-secondary)' }}>Buat akun calon siswa dan login ke dashboard.</p>
-                            </div>
+                                <h3 style={{ marginBottom: '1rem', fontSize: '1.25rem', fontWeight: '600' }}>1. Daftar Akun</h3>
+                                <p style={{ color: 'var(--text-secondary)', lineHeight: '1.7' }}>Buat akun calon siswa dan login ke dashboard.</p>
+                            </motion.div>
 
                             {/* Step 2 */}
-                            <div className="card" style={{ textAlign: 'center', padding: '2rem' }}>
-                                <div style={{ margin: '0 auto 1rem', width: '64px', height: '64px', backgroundColor: '#ecfdf5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary-color)' }}>
-                                    <Upload size={32} />
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.2 }}
+                                className="card"
+                                style={{ textAlign: 'center', padding: '2.5rem' }}
+                            >
+                                <div style={{ margin: '0 auto 1.5rem', width: '72px', height: '72px', backgroundColor: '#ecfdf5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary-color)' }}>
+                                    <Upload size={36} />
                                 </div>
-                                <h3 style={{ marginBottom: '0.5rem' }}>2. Pembayaran</h3>
-                                <p style={{ color: 'var(--text-secondary)' }}>Upload bukti pembayaran biaya pendaftaran.</p>
-                            </div>
+                                <h3 style={{ marginBottom: '1rem', fontSize: '1.25rem', fontWeight: '600' }}>2. Lengkapi Data</h3>
+                                <p style={{ color: 'var(--text-secondary)', lineHeight: '1.7' }}>Isi formulir biodata dan upload dokumen persyaratan.</p>
+                            </motion.div>
 
                             {/* Step 3 */}
-                            <div className="card" style={{ textAlign: 'center', padding: '2rem' }}>
-                                <div style={{ margin: '0 auto 1rem', width: '64px', height: '64px', backgroundColor: '#ecfdf5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary-color)' }}>
-                                    <Calendar size={32} />
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.3 }}
+                                className="card"
+                                style={{ textAlign: 'center', padding: '2.5rem' }}
+                            >
+                                <div style={{ margin: '0 auto 1.5rem', width: '72px', height: '72px', backgroundColor: '#ecfdf5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary-color)' }}>
+                                    <CheckCircle size={36} />
                                 </div>
-                                <h3 style={{ marginBottom: '0.5rem' }}>3. Isi Formulir</h3>
-                                <p style={{ color: 'var(--text-secondary)' }}>Lengkapi biodata dan upload berkas persyaratan.</p>
-                            </div>
+                                <h3 style={{ marginBottom: '1rem', fontSize: '1.25rem', fontWeight: '600' }}>3. Verifikasi</h3>
+                                <p style={{ color: 'var(--text-secondary)', lineHeight: '1.7' }}>Admin akan memverifikasi data dan dokumen Anda.</p>
+                            </motion.div>
 
                             {/* Step 4 */}
-                            <div className="card" style={{ textAlign: 'center', padding: '2rem' }}>
-                                <div style={{ margin: '0 auto 1rem', width: '64px', height: '64px', backgroundColor: '#ecfdf5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary-color)' }}>
-                                    <CheckCircle size={32} />
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.4 }}
+                                className="card"
+                                style={{ textAlign: 'center', padding: '2.5rem' }}
+                            >
+                                <div style={{ margin: '0 auto 1.5rem', width: '72px', height: '72px', backgroundColor: '#ecfdf5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary-color)' }}>
+                                    <Calendar size={36} />
                                 </div>
-                                <h3 style={{ marginBottom: '0.5rem' }}>4. Selesai</h3>
-                                <p style={{ color: 'var(--text-secondary)' }}>Tunggu verifikasi dan pengumuman kelulusan.</p>
-                            </div>
+                                <h3 style={{ marginBottom: '1rem', fontSize: '1.25rem', fontWeight: '600' }}>4. Pengumuman</h3>
+                                <p style={{ color: 'var(--text-secondary)', lineHeight: '1.7' }}>Cek status kelulusan pada tanggal pengumuman.</p>
+                            </motion.div>
                         </div>
                     </div>
                 </section>
 
                 {/* CTA Section */}
-                <section style={{ backgroundColor: 'var(--primary-color)', color: 'white', padding: '4rem 0', textAlign: 'center' }}>
+                <section style={{ backgroundColor: 'var(--primary-color)', color: 'white', padding: '6rem 0', textAlign: 'center' }}>
                     <div className="container">
-                        <h2 style={{ marginBottom: '1rem' }}>Siap Bergabung Bersama Kami?</h2>
-                        <p style={{ marginBottom: '2rem', fontSize: '1.1rem', opacity: 0.9 }}>
-                            Pendaftaran Tahun Ajaran Baru Telah Dibuka. Segera daftarkan putra-putri Anda.
-                        </p>
-                        <a href="/login" className="btn" style={{ backgroundColor: 'white', color: 'var(--primary-color)', padding: '0.75rem 2rem', fontSize: '1.1rem' }}>
-                            Daftar Sekarang
-                        </a>
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5 }}
+                        >
+                            <h2 style={{ marginBottom: '1.5rem', fontSize: '2.5rem', fontWeight: 'bold' }}>Siap Bergabung Bersama Kami?</h2>
+                            <p style={{ marginBottom: '2.5rem', fontSize: '1.25rem', opacity: 0.9, maxWidth: '600px', margin: '0 auto 2.5rem' }}>
+                                Pendaftaran Tahun Ajaran Baru Telah Dibuka. Segera daftarkan putra-putri Anda untuk masa depan yang gemilang.
+                            </p>
+                            <motion.a
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                href="/login"
+                                className="btn"
+                                style={{ backgroundColor: 'white', color: 'var(--primary-color)', padding: '1rem 3rem', fontSize: '1.25rem', borderRadius: 'var(--radius-full)', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)' }}
+                            >
+                                Daftar Sekarang
+                            </motion.a>
+                        </motion.div>
                     </div>
                 </section>
             </main>
