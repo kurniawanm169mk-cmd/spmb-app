@@ -25,7 +25,7 @@ export default function LoginPage() {
             if (user?.user_metadata?.role === 'admin') {
                 navigate('/admin');
             } else {
-                navigate('/dashboard');
+                navigate('/student');
             }
         } catch (err) {
             setError('Email atau password salah.');
