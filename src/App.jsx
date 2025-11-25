@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { supabase } from './lib/supabase';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -23,6 +24,24 @@ const ProtectedRoute = ({ children, role }) => {
 };
 
 function App() {
+    useEffect(() => {
+        const updateFavicon = async () => {
+            try {
+                const { data } = await supabase.from('school_settings').select('logo_url').maybeSingle();
+                if (data?.logo_url) {
+                    const link = document.querySelector("link[rel~='icon']") || document.createElement('link');
+                    link.type = 'image/png';
+                    link.rel = 'icon';
+                    link.href = data.logo_url;
+                    document.getElementsByTagName('head')[0].appendChild(link);
+                }
+            } catch (error) {
+                console.error('Error updating favicon:', error);
+            }
+        };
+        updateFavicon();
+    }, []);
+
     return (
         <AuthProvider>
             <Router>
