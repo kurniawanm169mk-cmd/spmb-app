@@ -3,6 +3,7 @@ import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 import { CreditCard, FileText, Upload, CheckCircle, AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
 import PaymentUpload from './PaymentUpload';
 import RegistrationForm from './RegistrationForm';
 import DocumentUpload from './DocumentUpload';
@@ -51,7 +52,7 @@ export default function StudentDashboard() {
             setRegistration(data);
         } catch (err) {
             console.error('Error starting registration:', err);
-            alert('Gagal memulai pendaftaran. Silahkan coba lagi.');
+            toast.error('Gagal memulai pendaftaran. Silahkan coba lagi.');
         } finally {
             setLoading(false);
         }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Search, Filter, Download, CheckCircle, XCircle, Eye, MessageCircle, Trash2, Edit, Plus, UserPlus } from 'lucide-react';
+import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
 
 export default function StudentList() {
@@ -96,7 +97,7 @@ export default function StudentList() {
             if (selectedStudent && selectedStudent.id === id) {
                 setSelectedStudent(prev => ({ ...prev, status: newStatus }));
             }
-            alert('Status berhasil diubah!');
+            toast.success('Status berhasil diubah!');
         } catch (err) {
             console.error('Error updating status:', err);
             alert(`Gagal mengubah status: ${err.message}\nDetails: ${err.details}\nHint: ${err.hint}`);
@@ -105,7 +106,7 @@ export default function StudentList() {
 
     const sendWhatsApp = (phone, message) => {
         if (!phone) {
-            alert('Nomor telepon tidak tersedia');
+            toast.success('Nomor telepon tidak tersedia');
             return;
         }
         let formatted = phone.replace(/\D/g, '');
@@ -136,12 +137,12 @@ export default function StudentList() {
             await supabase.from('profiles').update({ full_name: studentForm.full_name }).eq('id', selectedStudent.user_id);
             const newFormData = { ...selectedStudent.form_data, parent_phone: studentForm.phone };
             await supabase.from('registrations').update({ form_data: newFormData }).eq('id', selectedStudent.id);
-            alert('Data berhasil diupdate!');
+            toast.success('Data berhasil diupdate!');
             fetchStudents();
             setModalType(null);
         } catch (err) {
             console.error(err);
-            alert('Gagal update data.');
+            toast.error('Gagal update data.');
         }
     };
 

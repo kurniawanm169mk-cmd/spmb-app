@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Upload, Check } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function PaymentUpload({ registration, onUpdate }) {
     const [file, setFile] = useState(null);
@@ -47,7 +48,7 @@ export default function PaymentUpload({ registration, onUpdate }) {
 
             if (updateError) throw updateError;
 
-            alert('Bukti pembayaran berhasil diupload!');
+            toast.success('Bukti pembayaran berhasil diupload!');
             onUpdate(); // Refresh dashboard
         } catch (error) {
             console.error('Error uploading payment:', error);

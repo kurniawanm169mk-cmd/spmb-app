@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Save, Plus, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function SystemSettings() {
     const [dates, setDates] = useState({});
@@ -61,10 +62,10 @@ export default function SystemSettings() {
                 .eq('id', dates.id);
 
             if (error) throw error;
-            alert('Tanggal berhasil disimpan!');
+            toast.success('Tanggal berhasil disimpan!');
         } catch (err) {
             console.error('Error saving dates:', err);
-            alert('Gagal menyimpan tanggal.');
+            toast.error('Gagal menyimpan tanggal.');
         } finally {
             setSavingDates(false);
         }
@@ -115,11 +116,11 @@ export default function SystemSettings() {
             const { error } = await supabase.from('form_config').upsert(updates);
             if (error) throw error;
 
-            alert('Konfigurasi form berhasil disimpan!');
+            toast.success('Konfigurasi form berhasil disimpan!');
             fetchData(); // Refresh IDs
         } catch (err) {
             console.error('Error saving form config:', err);
-            alert('Gagal menyimpan konfigurasi form.');
+            toast.error('Gagal menyimpan konfigurasi form.');
         } finally {
             setSavingForm(false);
         }

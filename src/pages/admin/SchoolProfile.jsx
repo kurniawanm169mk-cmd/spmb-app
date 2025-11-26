@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Save, Plus, Trash2, Upload, Facebook, Instagram, Youtube, Twitter, Globe } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function SchoolProfile() {
     const [settings, setSettings] = useState({});
@@ -89,7 +90,7 @@ export default function SchoolProfile() {
             if (settings.primary_color) root.style.setProperty('--primary-color', settings.primary_color);
             if (settings.secondary_color) root.style.setProperty('--secondary-color', settings.secondary_color);
 
-            alert('Pengaturan berhasil disimpan!');
+            toast.success('Pengaturan berhasil disimpan!');
         } catch (err) {
             console.error('Error saving settings:', err);
             alert(`Gagal menyimpan pengaturan: ${err.message}`);
@@ -121,7 +122,7 @@ export default function SchoolProfile() {
             } else {
                 // If no ID, we can't update. We could insert, but maybe user hasn't filled other fields.
                 // Just let them click "Simpan".
-                alert('Logo diupload. Jangan lupa klik "Simpan Perubahan" untuk menyimpan ke database.');
+                toast.success('Logo diupload. Jangan lupa klik "Simpan Perubahan" untuk menyimpan ke database.');
             }
         } catch (err) {
             console.error('Error uploading logo:', err);
@@ -177,7 +178,7 @@ export default function SchoolProfile() {
             fetchData();
         } catch (err) {
             console.error('Error adding social:', err);
-            alert('Gagal menambah sosial media.');
+            toast.error('Gagal menambah sosial media.');
         }
     };
 

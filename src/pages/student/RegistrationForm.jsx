@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Save } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function RegistrationForm({ registration, onUpdate }) {
     const [formData, setFormData] = useState(registration.form_data || {});
@@ -67,11 +68,11 @@ export default function RegistrationForm({ registration, onUpdate }) {
                 .eq('id', registration.id);
 
             if (error) throw error;
-            alert('Data berhasil disimpan!');
+            toast.success('Data berhasil disimpan!');
             onUpdate();
         } catch (err) {
             console.error('Error saving form:', err);
-            alert('Gagal menyimpan data.');
+            toast.error('Gagal menyimpan data.');
         } finally {
             setSaving(false);
         }
