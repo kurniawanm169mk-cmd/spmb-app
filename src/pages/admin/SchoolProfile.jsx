@@ -306,6 +306,47 @@ export default function SchoolProfile() {
                 </div>
             </div>
 
+            {/* Hero & CTA Background Colors */}
+            <div className="card" style={{ marginBottom: '2rem' }}>
+                <h3 style={{ marginBottom: '1.5rem' }}>Warna Background Landing Page</h3>
+
+                <h4 style={{ marginBottom: '1rem', fontSize: '1.125rem', color: 'var(--text-secondary)' }}>Background Hero (SMPIT Ibnu Sina)</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '2rem' }}>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Warna 1 (Gradient Start)</label>
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <input type="color" name="hero_bg_color_1" value={settings.hero_bg_color_1 || '#10b981'} onChange={handleSettingsChange} style={{ height: '40px', width: '60px' }} />
+                            <input type="text" name="hero_bg_color_1" value={settings.hero_bg_color_1 || '#10b981'} onChange={handleSettingsChange} className="input" />
+                        </div>
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Warna 2 (Gradient End)</label>
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <input type="color" name="hero_bg_color_2" value={settings.hero_bg_color_2 || '#06b6d4'} onChange={handleSettingsChange} style={{ height: '40px', width: '60px' }} />
+                            <input type="text" name="hero_bg_color_2" value={settings.hero_bg_color_2 || '#06b6d4'} onChange={handleSettingsChange} className="input" />
+                        </div>
+                    </div>
+                </div>
+
+                <h4 style={{ marginBottom: '1rem', fontSize: '1.125rem', color: 'var(--text-secondary)' }}>Background CTA (Siap Bergabung Bersama Kami)</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Warna 1 (Gradient Start)</label>
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <input type="color" name="cta_bg_color_1" value={settings.cta_bg_color_1 || '#10b981'} onChange={handleSettingsChange} style={{ height: '40px', width: '60px' }} />
+                            <input type="text" name="cta_bg_color_1" value={settings.cta_bg_color_1 || '#10b981'} onChange={handleSettingsChange} className="input" />
+                        </div>
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Warna 2 (Gradient End)</label>
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <input type="color" name="cta_bg_color_2" value={settings.cta_bg_color_2 || '#06b6d4'} onChange={handleSettingsChange} style={{ height: '40px', width: '60px' }} />
+                            <input type="text" name="cta_bg_color_2" value={settings.cta_bg_color_2 || '#06b6d4'} onChange={handleSettingsChange} className="input" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
                 <button onClick={saveSettings} className="btn btn-primary" disabled={saving}>
                     <Save size={18} /> {saving ? 'Menyimpan...' : 'Simpan Perubahan'}

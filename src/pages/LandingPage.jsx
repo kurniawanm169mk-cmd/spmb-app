@@ -6,6 +6,7 @@ import Carousel from '../components/Carousel';
 import IconBox from '../components/IconBox';
 import InfoCard from '../components/InfoCard';
 import RunningText from '../components/RunningText';
+import NewsModal from '../components/NewsModal';
 import NewsCard from '../components/NewsCard';
 import GalleryGrid from '../components/GalleryGrid';
 import {
@@ -18,6 +19,10 @@ export default function LandingPage() {
     const [schoolSettings, setSchoolSettings] = useState(null);
     const [carouselImages, setCarouselImages] = useState([]);
     const [socials, setSocials] = useState([]);
+    const [features, setFeatures] = useState([]);
+    const [news, setNews] = useState([]);
+    const [gallery, setGallery] = useState([]);
+    const [selectedNews, setSelectedNews] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -53,6 +58,31 @@ export default function LandingPage() {
 
                 if (socialData) setSocials(socialData);
 
+                // Fetch Features
+                const { data: featuresData } = await supabase
+                    .from('features')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('order_index');
+                if (featuresData) setFeatures(featuresData);
+
+                // Fetch News
+                const { data: newsData } = await supabase
+                    .from('news')
+                    .select('*')
+                    .eq('is_published', true)
+                    .order('published_date', { ascending: false })
+                    .limit(3);
+                if (newsData) setNews(newsData);
+
+                // Fetch Gallery
+                const { data: galleryData } = await supabase
+                    .from('gallery')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('order_index');
+                if (galleryData) setGallery(galleryData);
+
             } catch (error) {
                 console.error('Error fetching data:', error);
             } finally {
@@ -77,11 +107,11 @@ export default function LandingPage() {
                     {/* Background with Carousel */}
                     <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
                         <Carousel slides={carouselImages} />
-                        {/* Overlay gradient */}
+                        {/* Overlay gradient - Dynamic colors from settings */}
                         <div style={{
                             position: 'absolute',
                             inset: 0,
-                            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.85) 0%, rgba(6, 182, 212, 0.75) 100%)',
+                            background: `linear-gradient(135deg, ${schoolSettings?.hero_bg_color_1 || '#10b981'}dd 0%, ${schoolSettings?.hero_bg_color_2 || '#06b6d4'}cc 100%)`,
                             zIndex: 1
                         }} />
                     </div>
