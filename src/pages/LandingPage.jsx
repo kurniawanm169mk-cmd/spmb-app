@@ -5,6 +5,9 @@ import Footer from '../components/Footer';
 import Carousel from '../components/Carousel';
 import IconBox from '../components/IconBox';
 import InfoCard from '../components/InfoCard';
+import RunningText from '../components/RunningText';
+import NewsCard from '../components/NewsCard';
+import GalleryGrid from '../components/GalleryGrid';
 import {
     Calendar, CheckCircle, FileText, Upload,
     CreditCard, Bell, Phone, School, Award, Users, BookOpen
@@ -385,6 +388,188 @@ export default function LandingPage() {
                                 Daftar Sekarang
                             </motion.a>
                         </motion.div>
+                    </div>
+                </section>
+
+                {/* Running Text - Announcement */}
+                <RunningText text="📢 Pendaftaran Siswa Baru Tahun Ajaran 2024/2025 Telah Dibuka! Daftar Sekarang!" />
+
+                {/* News & Announcements Section - Magazine Style */}
+                <section style={{ backgroundColor: 'white', padding: '6rem 0' }}>
+                    <div className="container">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            style={{ textAlign: 'center', marginBottom: '4rem' }}
+                        >
+                            <h2 style={{
+                                fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
+                                fontWeight: '800',
+                                color: 'var(--text-primary)',
+                                marginBottom: '1rem'
+                            }}>
+                                Berita & Pengumuman
+                            </h2>
+                            <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto' }}>
+                                Update terbaru seputar kegiatan dan prestasi sekolah
+                            </p>
+                        </motion.div>
+
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+                            gap: '2rem'
+                        }}>
+                            <NewsCard
+                                image="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600"
+                                category="Prestasi"
+                                title="Juara 1 Olimpiade Matematika Nasional"
+                                date="20 November 2024"
+                                excerpt="Siswa kami berhasil meraih medali emas dalam Olimpiade Matematika tingkat nasional yang diselenggarakan di Jakarta."
+                            />
+                            <NewsCard
+                                image="https://images.unsplash.com/photo-1509062522246-3755977927d7?w=600"
+                                category="Kegiatan"
+                                title="Pekan Olahraga Sekolah 2024"
+                                date="18 November 2024"
+                                excerpt="Rangkaian kegiatan olahraga diikuti oleh seluruh siswa dengan antusias. Berbagai cabang olahraga dipertandingkan."
+                            />
+                            <NewsCard
+                                image="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600"
+                                category="Pengumuman"
+                                title="Jadwal Ujian Akhir Semester"
+                                date="15 November 2024"
+                                excerpt="Pengumuman jadwal ujian akhir semester genap tahun ajaran 2024/2025. Harap siswa mempersiapkan diri dengan baik."
+                            />
+                        </div>
+                    </div>
+                </section>
+
+                {/* Gallery Section */}
+                <section style={{ backgroundColor: '#f8fafc', padding: '6rem 0' }}>
+                    <div className="container">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            style={{ textAlign: 'center', marginBottom: '4rem' }}
+                        >
+                            <h2 style={{
+                                fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
+                                fontWeight: '800',
+                                color: 'var(--text-primary)',
+                                marginBottom: '1rem'
+                            }}>
+                                Galeri Kegiatan
+                            </h2>
+                            <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto' }}>
+                                Dokumentasi kegiatan dan fasilitas sekolah
+                            </p>
+                        </motion.div>
+
+                        <GalleryGrid />
+                    </div>
+                </section>
+
+                {/* Contact & Map Section */}
+                <section style={{ backgroundColor: 'white', padding: '6rem 0' }}>
+                    <div className="container">
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                            gap: '3rem',
+                            alignItems: 'start'
+                        }}>
+                            {/* Contact Info */}
+                            <motion.div
+                                initial={{ opacity: 0, x: -20 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                viewport={{ once: true }}
+                            >
+                                <h3 style={{
+                                    fontSize: '1.75rem',
+                                    fontWeight: '700',
+                                    marginBottom: '1.5rem',
+                                    color: 'var(--text-primary)'
+                                }}>
+                                    Hubungi Kami
+                                </h3>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                    <div>
+                                        <h4 style={{ fontWeight: '600', marginBottom: '0.5rem', color: 'var(--primary-color)' }}>
+                                            📍 Alamat
+                                        </h4>
+                                        <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                                            {schoolSettings?.address || 'Alamat Sekolah...'}
+                                        </p>
+                                    </div>
+
+                                    {schoolSettings?.contact_phone && (
+                                        <div>
+                                            <h4 style={{ fontWeight: '600', marginBottom: '0.5rem', color: 'var(--primary-color)' }}>
+                                                📞 Telepon
+                                            </h4>
+                                            <p style={{ color: 'var(--text-secondary)' }}>
+                                                {schoolSettings.contact_phone}
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    <a
+                                        href="/register"
+                                        className="btn btn-primary"
+                                        style={{
+                                            display: 'inline-flex',
+                                            width: 'fit-content',
+                                            marginTop: '1rem'
+                                        }}
+                                    >
+                                        <Phone size={20} />
+                                        Hubungi Kami
+                                    </a>
+                                </div>
+                            </motion.div>
+
+                            {/* Google Maps */}
+                            <motion.div
+                                initial={{ opacity: 0, x: 20 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                viewport={{ once: true }}
+                                style={{
+                                    borderRadius: 'var(--radius-xl)',
+                                    overflow: 'hidden',
+                                    boxShadow: 'var(--shadow-lg)',
+                                    height: '400px'
+                                }}
+                            >
+                                {schoolSettings?.google_maps_url ? (
+                                    <iframe
+                                        src={schoolSettings.google_maps_url}
+                                        width="100%"
+                                        height="100%"
+                                        style={{ border: 0 }}
+                                        allowFullScreen=""
+                                        loading="lazy"
+                                        referrerPolicy="no-referrer-when-downgrade"
+                                        title="Google Maps"
+                                    />
+                                ) : (
+                                    <div style={{
+                                        width: '100%',
+                                        height: '100%',
+                                        backgroundColor: '#f1f5f9',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        color: 'var(--text-secondary)'
+                                    }}>
+                                        <p>Google Maps akan muncul di sini</p>
+                                    </div>
+                                )}
+                            </motion.div>
+                        </div>
                     </div>
                 </section>
             </main>
