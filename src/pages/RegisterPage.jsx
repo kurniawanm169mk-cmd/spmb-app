@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
-import { UserPlus, ArrowLeft, Upload, CreditCard } from 'lucide-react';
+import { sendRegistrationEmail } from '../lib/email';
+import { UserPlus, ArrowLeft, Upload, CreditCard, MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function RegisterPage() {
@@ -14,6 +15,7 @@ export default function RegisterPage() {
     const [schoolSettings, setSchoolSettings] = useState(null);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [successData, setSuccessData] = useState(null); // Store data for success view
 
     const { register } = useAuth();
     const navigate = useNavigate();
@@ -76,8 +78,6 @@ export default function RegisterPage() {
             }
 
             // 3. Create Registration Record
-            // IMPORTANT: Storing initial_password in form_data for Admin to see/send later.
-            // This is for demo purposes as requested.
             const { error: regError } = await supabase.from('registrations').insert([{
                 user_id: user.id,
                 status: 'payment_submitted',
@@ -91,9 +91,20 @@ export default function RegisterPage() {
 
             if (regError) throw regError;
 
-            // 4. Show Success Alert
-            alert(`Pendaftaran BERHASIL! \n\nPassword Anda: ${finalPassword} \n\nHarap simpan password ini untuk Login. \n\nAdmin kami juga akan mengirimkan detail akun ini melalui WhatsApp.`);
-            navigate('/login');
+            // 4. Send Email Notification (Fire and forget)
+            sendRegistrationEmail({
+                fullName,
+                email,
+                phone,
+                password: finalPassword
+            });
+
+            // 5. Show Success View instead of Alert
+            setSuccessData({
+                password: finalPassword,
+                phone: phone,
+                name: fullName
+            });
 
         } catch (err) {
             console.error(err);
@@ -102,6 +113,61 @@ export default function RegisterPage() {
             setLoading(false);
         }
     };
+
+    if (successData) {
+        const adminPhone = schoolSettings?.contact_phone || '';
+        // Format phone for WhatsApp (remove leading 0, add 62)
+        const formattedAdminPhone = adminPhone.startsWith('0') ? '62' + adminPhone.slice(1) : adminPhone;
+
+        const waMessage = `Halo Admin, saya siswa baru telah mendaftar.
+Nama: ${successData.name}
+Email: ${email}
+Mohon dicek. Terima kasih.`;
+
+        const waLink = `https://wa.me/${formattedAdminPhone}?text=${encodeURIComponent(waMessage)}`;
+
+        return (
+            <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--bg-color)', padding: '2rem 1rem' }}>
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="card glass"
+                    style={{ width: '100%', maxWidth: '500px', textAlign: 'center', padding: '2rem' }}
+                >
+                    <div style={{ width: '80px', height: '80px', backgroundColor: '#ecfdf5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', color: '#10b981' }}>
+                        <UserPlus size={40} />
+                    </div>
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem', color: 'var(--text-primary)' }}>Pendaftaran Berhasil!</h2>
+                    <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>
+                        Akun Anda telah dibuat. Silakan simpan password di bawah ini untuk login.
+                    </p>
+
+                    <div style={{ backgroundColor: '#f8fafc', padding: '1.5rem', borderRadius: 'var(--radius-md)', marginBottom: '2rem', border: '1px dashed var(--border-color)' }}>
+                        <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Password Anda:</p>
+                        <p style={{ fontSize: '2rem', fontWeight: 'bold', letterSpacing: '2px', color: 'var(--primary-color)' }}>{successData.password}</p>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {adminPhone && (
+                            <a
+                                href={waLink}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="btn"
+                                style={{ backgroundColor: '#25D366', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', border: 'none' }}
+                            >
+                                <MessageCircle size={20} /> Konfirmasi ke WhatsApp Admin
+                            </a>
+                        )}
+
+                        <Link to="/login" className="btn btn-primary">
+                            Masuk ke Aplikasi
+                        </Link>
+                    </div>
+                </motion.div>
+            </div>
+        );
+    }
 
     return (
         <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--bg-color)', padding: '2rem 1rem' }}>
