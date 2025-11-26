@@ -106,6 +106,8 @@ export default function DocumentUpload({ registration, onUpdate }) {
             await fetchDocuments();
             checkCompletion();
 
+            alert('Selesai unggah! Dokumen berhasil disimpan.');
+
         } catch (err) {
             console.error('Error uploading:', err);
             setError('Gagal upload: ' + err.message);
@@ -233,7 +235,7 @@ export default function DocumentUpload({ registration, onUpdate }) {
                                                 disabled={uploading}
                                             />
                                             <label htmlFor={`upload-${doc.id}`} className="btn btn-primary" style={{ cursor: uploading ? 'not-allowed' : 'pointer', opacity: uploading ? 0.7 : 1 }}>
-                                                <Upload size={18} /> Upload
+                                                <Upload size={18} /> {uploading ? 'Sedang mengunggah...' : 'Upload'}
                                             </label>
                                         </div>
                                     )}

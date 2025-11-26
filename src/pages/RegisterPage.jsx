@@ -291,7 +291,7 @@ Mohon dicek. Terima kasih.`;
                     </div>
 
                     <button type="submit" className="btn btn-primary" disabled={loading || !!error} style={{ marginTop: '0.5rem', opacity: (loading || !!error) ? 0.7 : 1 }}>
-                        {loading ? 'Memproses...' : 'Daftar & Kirim Bukti'}
+                        {loading ? 'Sedang memproses...' : 'Daftar & Kirim Bukti'}
                     </button>
                 </form>
 

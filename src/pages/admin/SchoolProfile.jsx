@@ -239,6 +239,17 @@ export default function SchoolProfile() {
                         <label style={{ display: 'block', marginBottom: '0.5rem' }}>Google Maps URL (Embed)</label>
                         <input type="text" name="google_maps_url" value={settings.google_maps_url || ''} onChange={handleSettingsChange} className="input" placeholder="https://www.google.com/maps/embed?..." />
                     </div>
+
+                    <hr style={{ margin: '1rem 0', border: 'none', borderTop: '1px solid var(--border-color)' }} />
+
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Judul CTA (Halaman Depan)</label>
+                        <input type="text" name="cta_title" value={settings.cta_title || ''} onChange={handleSettingsChange} className="input" placeholder="Siap Bergabung Bersama Kami?" />
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Deskripsi CTA (Halaman Depan)</label>
+                        <textarea name="cta_description" value={settings.cta_description || ''} onChange={handleSettingsChange} className="input" rows={3} placeholder="Pendaftaran Tahun Ajaran Baru Telah Dibuka..." />
+                    </div>
                 </div>
             </div>
 
