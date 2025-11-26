@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Upload, Trash2, FileText, CheckCircle, Eye, File, Image } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function DocumentUpload({ registration, onUpdate }) {
     const [documents, setDocuments] = useState([]);
     const [uploading, setUploading] = useState(false);
-    const [error, setError] = useState('');
 
     // Define required documents
     const requiredDocs = [
@@ -64,17 +64,17 @@ export default function DocumentUpload({ registration, onUpdate }) {
         const file = e.target.files[0];
         if (!file) return;
 
-        setError('');
-
         // Validate file
         const validation = validateFile(file);
         if (!validation.valid) {
-            setError(validation.error);
+            toast.error(validation.error);
             e.target.value = ''; // Reset input
             return;
         }
 
         setUploading(true);
+        const toastId = toast.loading('Sedang mengunggah dokumen...');
+
         try {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error('User not found');
@@ -106,11 +106,11 @@ export default function DocumentUpload({ registration, onUpdate }) {
             await fetchDocuments();
             checkCompletion();
 
-            alert('Selesai unggah! Dokumen berhasil disimpan.');
+            toast.success('Dokumen berhasil diunggah!', { id: toastId });
 
         } catch (err) {
             console.error('Error uploading:', err);
-            setError('Gagal upload: ' + err.message);
+            toast.error('Gagal upload: ' + err.message, { id: toastId });
         } finally {
             setUploading(false);
             e.target.value = ''; // Reset input
@@ -131,9 +131,10 @@ export default function DocumentUpload({ registration, onUpdate }) {
             await supabase.storage.from('private-docs').remove([filePath]);
             await supabase.from('documents').delete().eq('id', docId);
             fetchDocuments();
+            toast.success('Dokumen berhasil dihapus');
         } catch (err) {
             console.error('Error deleting:', err);
-            alert('Gagal menghapus dokumen');
+            toast.error('Gagal menghapus dokumen');
         }
     };
 
@@ -149,7 +150,7 @@ export default function DocumentUpload({ registration, onUpdate }) {
             window.open(data.signedUrl, '_blank');
         } catch (err) {
             console.error('Error viewing document:', err);
-            alert('Gagal membuka dokumen');
+            toast.error('Gagal membuka dokumen');
         }
     };
 
@@ -175,12 +176,6 @@ export default function DocumentUpload({ registration, onUpdate }) {
             <p style={{ marginBottom: '1.5rem', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
                 Format: JPG, PNG, PDF, DOC, DOCX | Maksimal: 2MB per file
             </p>
-
-            {error && (
-                <div style={{ backgroundColor: '#fef2f2', color: 'var(--error)', padding: '0.75rem', borderRadius: 'var(--radius-md)', marginBottom: '1rem', fontSize: '0.875rem' }}>
-                    {error}
-                </div>
-            )}
 
             <div style={{ display: 'grid', gap: '1.5rem' }}>
                 {requiredDocs.map((doc) => {
