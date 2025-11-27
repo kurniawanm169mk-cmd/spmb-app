@@ -74,6 +74,25 @@ export default function Typography() {
                 </button>
             </div>
 
+            {/* Font Family */}
+            <div className="card" style={{ marginBottom: '1.5rem' }}>
+                <h3 style={{ marginBottom: '1rem' }}>Jenis Font Website</h3>
+                <div>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Nama Font (Google Fonts)</label>
+                    <input
+                        type="text"
+                        name="font_family"
+                        value={settings.font_family || 'Inter'}
+                        onChange={handleChange}
+                        className="input"
+                        placeholder="Contoh: Poppins, Roboto, Open Sans"
+                    />
+                    <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
+                        Pastikan nama font sesuai dengan yang ada di <a href="https://fonts.google.com" target="_blank" rel="noreferrer" style={{ color: 'var(--primary-color)', textDecoration: 'underline' }}>Google Fonts</a>.
+                    </p>
+                </div>
+            </div>
+
             {/* Header Title (Navbar) */}
             <div className="card" style={{ marginBottom: '1.5rem' }}>
                 <h3 style={{ marginBottom: '1rem' }}>Header Title (Nama Sekolah di Navbar)</h3>
