@@ -318,10 +318,5 @@ Mohon dicek. Terima kasih.`;
             </motion.div>
         </div>
     );
-                </Link >
-            </div >
-        </div >
-            </motion.div >
-        </div >
-    );
+
 }
