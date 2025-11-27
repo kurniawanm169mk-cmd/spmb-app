@@ -90,6 +90,7 @@ export default function SchoolProfile() {
             if (settings.primary_color) root.style.setProperty('--primary-color', settings.primary_color);
             if (settings.secondary_color) root.style.setProperty('--secondary-color', settings.secondary_color);
             if (settings.font_family) root.style.setProperty('--font-primary', `'${settings.font_family}', sans-serif`);
+            if (settings.border_radius) root.style.setProperty('--radius-global', settings.border_radius);
 
             toast.success('Pengaturan berhasil disimpan!');
         } catch (err) {
@@ -327,6 +328,63 @@ export default function SchoolProfile() {
                         Pilih font yang sesuai dengan karakter sekolah Anda.
                     </p>
                 </div>
+
+                <hr style={{ margin: '1.5rem 0', border: 'none', borderTop: '1px solid var(--border-color)' }} />
+
+                <h4 style={{ marginBottom: '1rem', fontSize: '1.125rem' }}>Tampilan Sudut (Rounded)</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
+                    {['0px', '0.5rem', '1rem', '2rem'].map((radius, index) => (
+                        <button
+                            key={radius}
+                            onClick={() => handleSettingsChange({ target: { name: 'border_radius', value: radius } })}
+                            style={{
+                                padding: '0.75rem',
+                                border: `2px solid ${settings.border_radius === radius ? 'var(--primary-color)' : 'var(--border-color)'}`,
+                                borderRadius: radius,
+                                backgroundColor: settings.border_radius === radius ? 'var(--primary-color)' : 'white',
+                                color: settings.border_radius === radius ? 'white' : 'var(--text-primary)',
+                                cursor: 'pointer',
+                                fontWeight: '600'
+                            }}
+                        >
+                            {['Kotak', 'Sedikit', 'Sedang', 'Bulat'][index]}
+                        </button>
+                    ))}
+                </div>
+
+                <hr style={{ margin: '1.5rem 0', border: 'none', borderTop: '1px solid var(--border-color)' }} />
+
+                <h4 style={{ marginBottom: '1rem', fontSize: '1.125rem' }}>Hero Section</h4>
+                <div style={{ display: 'grid', gap: '1.5rem' }}>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>
+                            Kegelapan Overlay ({settings.hero_overlay_opacity || 50}%)
+                        </label>
+                        <input
+                            type="range"
+                            name="hero_overlay_opacity"
+                            min="0"
+                            max="90"
+                            value={settings.hero_overlay_opacity || 50}
+                            onChange={handleSettingsChange}
+                            style={{ width: '100%', accentColor: 'var(--primary-color)' }}
+                        />
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>
+                            Blur Background ({settings.hero_blur || 0}px)
+                        </label>
+                        <input
+                            type="range"
+                            name="hero_blur"
+                            min="0"
+                            max="10"
+                            value={settings.hero_blur || 0}
+                            onChange={handleSettingsChange}
+                            style={{ width: '100%', accentColor: 'var(--primary-color)' }}
+                        />
+                    </div>
+                </div>
             </div>
 
             <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
@@ -372,6 +430,6 @@ export default function SchoolProfile() {
                     {carouselImages.length === 0 && <p style={{ color: 'var(--text-secondary)' }}>Belum ada foto.</p>}
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

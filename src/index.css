@@ -13,6 +13,26 @@
   --text-secondary: #475569;
   --border-color: #e2e8f0;
 
+  /* Spacing & Radius - Softer Look */
+  --radius-sm: 0.75rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+  --radius-xl: 2rem;
+  --radius-full: 9999px;
+
+  /* Global Radius Setting */
+  --radius-global: 1rem;
+  /* Default */
+
+  /* Shadows - Softer & Diffused */
+  --shadow-sm: 0 2px 4px rgb(0 0 0 / 0.02);
+  --shadow-md: 0 4px 8px -2px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --shadow-lg: 0 12px 24px -6px rgb(0 0 0 / 0.08), 0 4px 8px -4px rgb(0 0 0 / 0.04);
+  --shadow-xl: 0 24px 48px -12px rgb(0 0 0 / 0.12);
+
+  /* Fonts */
+  --font-primary: 'Inter', sans-serif;
+  /* Default */
 }
 
 body {
@@ -23,6 +43,9 @@ body {
     radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.1) 0px, transparent 50%),
     radial-gradient(at 100% 0%, rgba(52, 211, 153, 0.1) 0px, transparent 50%);
   background-attachment: fixed;
+  font-family: var(--font-primary);
+  line-height: 1.6;
+  font-weight: 400;
 }
 
 a {
@@ -55,7 +78,7 @@ button {
   align-items: center;
   justify-content: center;
   padding: 0.625rem 1.25rem;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-global);
   font-weight: 600;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: none;
@@ -94,7 +117,7 @@ button {
   width: 100%;
   padding: 0.75rem 1rem;
   border: 2px solid var(--border-color);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-global);
   background-color: var(--surface-color);
   color: var(--text-primary);
   transition: all 0.2s;
@@ -109,7 +132,7 @@ button {
 
 .card {
   background-color: var(--surface-color);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-global);
   padding: 2rem;
   box-shadow: var(--shadow-lg);
   border: 1px solid rgba(255, 255, 255, 0.5);

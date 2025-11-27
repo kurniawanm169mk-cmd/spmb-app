@@ -27,7 +27,7 @@ function App() {
     useEffect(() => {
         const fetchSettings = async () => {
             try {
-                const { data } = await supabase.from('school_settings').select('logo_url, font_family').maybeSingle();
+                const { data } = await supabase.from('school_settings').select('logo_url, font_family, border_radius').maybeSingle();
                 if (data) {
                     // Update Favicon
                     if (data.logo_url) {
@@ -41,6 +41,11 @@ function App() {
                     // Update Font Family
                     if (data.font_family) {
                         document.documentElement.style.setProperty('--font-primary', `'${data.font_family}', sans-serif`);
+                    }
+
+                    // Update Border Radius
+                    if (data.border_radius) {
+                        document.documentElement.style.setProperty('--radius-global', data.border_radius);
                     }
                 }
             } catch (error) {

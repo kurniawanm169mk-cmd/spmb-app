@@ -71,6 +71,16 @@ export default function LandingPage() {
                         <Carousel slides={carouselImages} height="100dvh" />
                     </div>
 
+                    {/* Dark Overlay & Blur */}
+                    <div style={{
+                        position: 'absolute',
+                        inset: 0,
+                        zIndex: 0,
+                        backgroundColor: `rgba(0, 0, 0, ${(schoolSettings?.hero_overlay_opacity ?? 50) / 100})`,
+                        backdropFilter: `blur(${schoolSettings?.hero_blur || 0}px)`,
+                        WebkitBackdropFilter: `blur(${schoolSettings?.hero_blur || 0}px)`
+                    }}></div>
+
                     {/* Overlay Content */}
                     <div className="container" style={{ position: 'relative', zIndex: 1, textAlign: 'center', color: 'white', textShadow: '0 2px 4px rgba(0,0,0,0.5)', padding: '0 1rem' }}>
                         <motion.div
