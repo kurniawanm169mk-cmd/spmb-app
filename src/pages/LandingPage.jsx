@@ -237,7 +237,7 @@ export default function LandingPage() {
                             transition={{ duration: 0.5 }}
                         >
                             <h2 className="cta-title" style={{ marginBottom: '1.5rem', fontWeight: 'bold' }}>{schoolSettings?.cta_title || 'Siap Bergabung Bersama Kami?'}</h2>
-                            <p style={{ marginBottom: '2.5rem', fontSize: '1.25rem', opacity: 0.9, maxWidth: '600px', margin: '0 auto 2.5rem' }}>
+                            <p className="cta-description" style={{ marginBottom: '2.5rem', opacity: 0.9, maxWidth: '600px', margin: '0 auto 2.5rem' }}>
                                 {schoolSettings?.cta_description || 'Pendaftaran Tahun Ajaran Baru Telah Dibuka. Segera daftarkan putra-putri Anda untuk masa depan yang gemilang.'}
                             </p>
                             <motion.a

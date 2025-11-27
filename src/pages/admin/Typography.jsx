@@ -74,6 +74,35 @@ export default function Typography() {
                 </button>
             </div>
 
+            {/* Header Title (Navbar) */}
+            <div className="card" style={{ marginBottom: '1.5rem' }}>
+                <h3 style={{ marginBottom: '1rem' }}>Header Title (Nama Sekolah di Navbar)</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Ukuran Font PC</label>
+                        <input
+                            type="text"
+                            name="header_title_size_pc"
+                            value={settings.header_title_size_pc || '1.5rem'}
+                            onChange={handleChange}
+                            className="input"
+                            placeholder="1.5rem"
+                        />
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Ukuran Font Mobile</label>
+                        <input
+                            type="text"
+                            name="header_title_size_mobile"
+                            value={settings.header_title_size_mobile || '1.25rem'}
+                            onChange={handleChange}
+                            className="input"
+                            placeholder="1.25rem"
+                        />
+                    </div>
+                </div>
+            </div>
+
             {/* Hero Title */}
             <div className="card" style={{ marginBottom: '1.5rem' }}>
                 <h3 style={{ marginBottom: '1rem' }}>Hero Title (Judul Utama)</h3>
@@ -164,31 +193,98 @@ export default function Typography() {
                 </div>
             </div>
 
-            {/* CTA Title */}
+            {/* CTA Section */}
             <div className="card">
-                <h3 style={{ marginBottom: '1rem' }}>CTA Title</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Ukuran Font PC</label>
-                        <input
-                            type="text"
-                            name="cta_title_size_pc"
-                            value={settings.cta_title_size_pc || '2.5rem'}
-                            onChange={handleChange}
-                            className="input"
-                            placeholder="2.5rem"
-                        />
+                <h3 style={{ marginBottom: '1rem' }}>CTA Section</h3>
+
+                {/* CTA Title */}
+                <div style={{ marginBottom: '1.5rem' }}>
+                    <h4 style={{ fontSize: '0.9rem', fontWeight: '600', marginBottom: '0.5rem' }}>Judul CTA</h4>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1rem' }}>
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Ukuran Font PC</label>
+                            <input
+                                type="text"
+                                name="cta_title_size_pc"
+                                value={settings.cta_title_size_pc || '2.5rem'}
+                                onChange={handleChange}
+                                className="input"
+                                placeholder="2.5rem"
+                            />
+                        </div>
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Ukuran Font Mobile</label>
+                            <input
+                                type="text"
+                                name="cta_title_size_mobile"
+                                value={settings.cta_title_size_mobile || '1.75rem'}
+                                onChange={handleChange}
+                                className="input"
+                                placeholder="1.75rem"
+                            />
+                        </div>
                     </div>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Ukuran Font Mobile</label>
-                        <input
-                            type="text"
-                            name="cta_title_size_mobile"
-                            value={settings.cta_title_size_mobile || '1.75rem'}
-                            onChange={handleChange}
-                            className="input"
-                            placeholder="1.75rem"
-                        />
+
+                    {/* CTA Title Styling */}
+                    <div style={{ display: 'flex', gap: '1.5rem' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                            <input
+                                type="checkbox"
+                                name="cta_title_bold"
+                                checked={settings.cta_title_bold || false}
+                                onChange={(e) => setSettings(prev => ({ ...prev, cta_title_bold: e.target.checked }))}
+                            />
+                            Bold
+                        </label>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                            <input
+                                type="checkbox"
+                                name="cta_title_italic"
+                                checked={settings.cta_title_italic || false}
+                                onChange={(e) => setSettings(prev => ({ ...prev, cta_title_italic: e.target.checked }))}
+                            />
+                            Italic
+                        </label>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                            <input
+                                type="checkbox"
+                                name="cta_title_underline"
+                                checked={settings.cta_title_underline || false}
+                                onChange={(e) => setSettings(prev => ({ ...prev, cta_title_underline: e.target.checked }))}
+                            />
+                            Underline
+                        </label>
+                    </div>
+                </div>
+
+                <hr style={{ margin: '1.5rem 0', border: 'none', borderTop: '1px solid var(--border-color)' }} />
+
+                {/* CTA Description */}
+                <div>
+                    <h4 style={{ fontSize: '0.9rem', fontWeight: '600', marginBottom: '0.5rem' }}>Teks Pendukung (Deskripsi)</h4>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Ukuran Font PC</label>
+                            <input
+                                type="text"
+                                name="cta_description_size_pc"
+                                value={settings.cta_description_size_pc || '1.25rem'}
+                                onChange={handleChange}
+                                className="input"
+                                placeholder="1.25rem"
+                            />
+                        </div>
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Ukuran Font Mobile</label>
+                            <input
+                                type="text"
+                                name="cta_description_size_mobile"
+                                value={settings.cta_description_size_mobile || '1rem'}
+                                onChange={handleChange}
+                                className="input"
+                                placeholder="1rem"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

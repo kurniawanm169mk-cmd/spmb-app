@@ -1,3 +1,9 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 :root {
   /* Brand Colors - Modern Emerald */
   --primary-color: #10b981;
@@ -31,20 +37,6 @@
   --shadow-xl: 0 24px 48px -12px rgb(0 0 0 / 0.12);
 
   /* Fonts */
-  --font-primary: 'Inter', sans-serif;
-  /* Default */
-}
-
-body {
-  background-color: var(--bg-color);
-  color: var(--text-primary);
-  min-height: 100vh;
-  background-image:
-    radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.1) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(52, 211, 153, 0.1) 0px, transparent 50%);
-  background-attachment: fixed;
-  font-family: var(--font-primary);
-  line-height: 1.6;
   font-weight: 400;
 }
 

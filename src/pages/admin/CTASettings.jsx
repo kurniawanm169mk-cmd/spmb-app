@@ -113,16 +113,28 @@ export default function CTASettings() {
                     </div>
                 )}
 
-                <input
-                    type="file"
-                    id="cta-image"
-                    style={{ display: 'none' }}
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                />
-                <label htmlFor="cta-image" className="btn btn-outline" style={{ cursor: 'pointer' }}>
-                    <Upload size={18} /> {settings.cta_image_url ? 'Ganti Gambar' : 'Upload Gambar'}
-                </label>
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <input
+                        type="file"
+                        id="cta-image"
+                        style={{ display: 'none' }}
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                    />
+                    <label htmlFor="cta-image" className="btn btn-outline" style={{ cursor: 'pointer' }}>
+                        <Upload size={18} /> {settings.cta_image_url ? 'Ganti Gambar' : 'Upload Gambar'}
+                    </label>
+
+                    {settings.cta_image_url && (
+                        <button
+                            onClick={() => setSettings(prev => ({ ...prev, cta_image_url: null }))}
+                            className="btn"
+                            style={{ backgroundColor: '#fee2e2', color: '#ef4444', border: '1px solid #fecaca' }}
+                        >
+                            Hapus Gambar
+                        </button>
+                    )}
+                </div>
                 <p style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
                     Recommended: 1920x600px, format JPG/PNG
                 </p>

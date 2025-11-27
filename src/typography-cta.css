@@ -6,78 +6,120 @@
     --hero-title-spacing-pc: -0.02em;
     --hero-title-spacing-mobile: -0.01em;
 
-    --schedule-size-pc: 1rem;
-    --schedule-size-mobile: 0.875rem;
-    --schedule-spacing-pc: 0em;
-    --schedule-spacing-mobile: 0em;
+    /* Typography Settings */
+    :root {
+        /* Defaults */
+        --hero-title-size-pc: 3.5rem;
+        --hero-title-size-mobile: 2rem;
+        --hero-title-spacing-pc: -0.02em;
+        --hero-title-spacing-mobile: -0.01em;
 
-    --cta-title-size-pc: 2.5rem;
-    --cta-title-size-mobile: 1.75rem;
-    --cta-title-spacing-pc: -0.01em;
-    --cta-title-spacing-mobile: 0em;
+        --schedule-size-pc: 1rem;
+        --schedule-size-mobile: 0.875rem;
+        --schedule-spacing-pc: 0em;
+        --schedule-spacing-mobile: 0em;
 
-    --cta-bg-image: none;
-    --cta-overlay-opacity: 0.8;
-}
+        --header-title-size-pc: 1.5rem;
+        --header-title-size-mobile: 1.25rem;
 
-/* Responsive Classes */
+        --cta-title-size-pc: 2.5rem;
+        --cta-title-size-mobile: 1.75rem;
+        --cta-title-spacing-pc: -0.01em;
+        --cta-title-spacing-mobile: 0em;
+        --cta-title-weight: bold;
+        --cta-title-style: normal;
+        --cta-title-decoration: none;
 
-/* Hero Title */
-.hero-title {
-    font-size: var(--hero-title-size-mobile);
-    letter-spacing: var(--hero-title-spacing-mobile);
-    line-height: 1.2;
-}
+        --cta-desc-size-pc: 1.25rem;
+        --cta-desc-size-mobile: 1rem;
 
-@media (min-width: 768px) {
+        --cta-bg-image: none;
+        --cta-overlay-opacity: 0.8;
+    }
+
+    /* Responsive Classes */
+
+    /* Header Title (Navbar) */
+    .header-title {
+        font-size: var(--header-title-size-mobile);
+    }
+
+    @media (min-width: 768px) {
+        .header-title {
+            font-size: var(--header-title-size-pc);
+        }
+    }
+
+    /* Hero Title */
     .hero-title {
-        font-size: var(--hero-title-size-pc);
-        letter-spacing: var(--hero-title-spacing-pc);
+        font-size: var(--hero-title-size-mobile);
+        letter-spacing: var(--hero-title-spacing-mobile);
+        line-height: 1.2;
     }
-}
 
-/* Schedule Text */
-.schedule-text {
-    font-size: var(--schedule-size-mobile);
-    letter-spacing: var(--schedule-spacing-mobile);
-}
+    @media (min-width: 768px) {
+        .hero-title {
+            font-size: var(--hero-title-size-pc);
+            letter-spacing: var(--hero-title-spacing-pc);
+        }
+    }
 
-@media (min-width: 768px) {
+    /* Schedule Text */
     .schedule-text {
-        font-size: var(--schedule-size-pc);
-        letter-spacing: var(--schedule-spacing-pc);
+        font-size: var(--schedule-size-mobile);
+        letter-spacing: var(--schedule-spacing-mobile);
     }
-}
 
-/* CTA Title */
-.cta-title {
-    font-size: var(--cta-title-size-mobile);
-    letter-spacing: var(--cta-title-spacing-mobile);
-}
+    @media (min-width: 768px) {
+        .schedule-text {
+            font-size: var(--schedule-size-pc);
+            letter-spacing: var(--schedule-spacing-pc);
+        }
+    }
 
-@media (min-width: 768px) {
+    /* CTA Title */
     .cta-title {
-        font-size: var(--cta-title-size-pc);
-        letter-spacing: var(--cta-title-spacing-pc);
+        font-size: var(--cta-title-size-mobile);
+        letter-spacing: var(--cta-title-spacing-mobile);
+        font-weight: var(--cta-title-weight);
+        font-style: var(--cta-title-style);
+        text-decoration: var(--cta-title-decoration);
     }
-}
 
-/* CTA Background */
-.cta-section-bg {
-    position: relative;
-    background-size: cover;
-    background-position: center;
-    background-image: var(--cta-bg-image, none);
-}
+    @media (min-width: 768px) {
+        .cta-title {
+            font-size: var(--cta-title-size-pc);
+            letter-spacing: var(--cta-title-spacing-pc);
+        }
+    }
 
-.cta-overlay {
-    position: absolute;
-    inset: 0;
-    background-color: rgba(0, 0, 0, var(--cta-overlay-opacity, 0.8));
-    z-index: 0;
-}
+    /* CTA Description */
+    .cta-description {
+        font-size: var(--cta-desc-size-mobile);
+    }
 
-.cta-content {
-    position: relative;
-    z-index: 1;
-}
+    @media (min-width: 768px) {
+        .cta-description {
+            font-size: var(--cta-desc-size-pc);
+        }
+    }
+
+    /* CTA Background */
+    .cta-section-bg {
+        position: relative;
+        background-size: cover;
+        background-position: center;
+        background-image: var(--cta-bg-image, none);
+    }
+
+    .cta-overlay {
+        position: absolute;
+        inset: 0;
+        background-color: rgba(0, 0, 0, var(--cta-overlay-opacity, 0.8));
+        z-index: 0;
+    }
+
+    .cta-content {
+        position: relative;
+        z-index: 1;
+    }

@@ -38,7 +38,7 @@ const Navbar = ({ schoolSettings }) => {
                             IS
                         </div>
                     )}
-                    <span style={{ fontWeight: 'bold', fontSize: '1.25rem', color: 'var(--primary-color)' }}>
+                    <span className="header-title" style={{ fontWeight: 'bold', color: 'var(--primary-color)' }}>
                         {school_name}
                     </span>
                 </Link>

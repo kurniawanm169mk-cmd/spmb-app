@@ -93,8 +93,8 @@ export default function RegistrationForm({ registration, onUpdate }) {
                         className="input"
                         required
                     >
-                        <option value="Fullday">Fullday (Pulang Pergi)</option>
-                        <option value="Boarding">Boarding (Asrama)</option>
+                        <option value="Fullday">Fullday</option>
+                        <option value="Boarding">Boarding</option>
                     </select>
                 </div>
 

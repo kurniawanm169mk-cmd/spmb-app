@@ -50,6 +50,10 @@ function App() {
                         root.style.setProperty('--radius-global', data.border_radius);
                     }
 
+                    // Typography - Header Title
+                    if (data.header_title_size_pc) root.style.setProperty('--header-title-size-pc', data.header_title_size_pc);
+                    if (data.header_title_size_mobile) root.style.setProperty('--header-title-size-mobile', data.header_title_size_mobile);
+
                     // Typography - Hero Title
                     if (data.hero_title_size_pc) root.style.setProperty('--hero-title-size-pc', data.hero_title_size_pc);
                     if (data.hero_title_size_mobile) root.style.setProperty('--hero-title-size-mobile', data.hero_title_size_mobile);
@@ -68,9 +72,20 @@ function App() {
                     if (data.cta_title_spacing_pc) root.style.setProperty('--cta-title-spacing-pc', data.cta_title_spacing_pc);
                     if (data.cta_title_spacing_mobile) root.style.setProperty('--cta-title-spacing-mobile', data.cta_title_spacing_mobile);
 
+                    // CTA Title Styles
+                    root.style.setProperty('--cta-title-weight', data.cta_title_bold ? 'bold' : 'normal');
+                    root.style.setProperty('--cta-title-style', data.cta_title_italic ? 'italic' : 'normal');
+                    root.style.setProperty('--cta-title-decoration', data.cta_title_underline ? 'underline' : 'none');
+
+                    // Typography - CTA Description
+                    if (data.cta_description_size_pc) root.style.setProperty('--cta-desc-size-pc', data.cta_description_size_pc);
+                    if (data.cta_description_size_mobile) root.style.setProperty('--cta-desc-size-mobile', data.cta_description_size_mobile);
+
                     // CTA Section
                     if (data.cta_image_url) {
                         root.style.setProperty('--cta-bg-image', `url('${data.cta_image_url}')`);
+                    } else {
+                        root.style.setProperty('--cta-bg-image', 'none');
                     }
                     if (data.cta_overlay_opacity !== undefined && data.cta_overlay_opacity !== null) {
                         const opacity = parseInt(data.cta_overlay_opacity) / 100;
