@@ -27,8 +27,10 @@ function App() {
     useEffect(() => {
         const fetchSettings = async () => {
             try {
-                const { data } = await supabase.from('school_settings').select('logo_url, font_family, border_radius').maybeSingle();
+                const { data } = await supabase.from('school_settings').select('*').maybeSingle();
                 if (data) {
+                    const root = document.documentElement;
+
                     // Update Favicon
                     if (data.logo_url) {
                         const link = document.querySelector("link[rel~='icon']") || document.createElement('link');
@@ -40,12 +42,39 @@ function App() {
 
                     // Update Font Family
                     if (data.font_family) {
-                        document.documentElement.style.setProperty('--font-primary', `'${data.font_family}', sans-serif`);
+                        root.style.setProperty('--font-primary', `'${data.font_family}', sans-serif`);
                     }
 
                     // Update Border Radius
                     if (data.border_radius) {
-                        document.documentElement.style.setProperty('--radius-global', data.border_radius);
+                        root.style.setProperty('--radius-global', data.border_radius);
+                    }
+
+                    // Typography - Hero Title
+                    if (data.hero_title_size_pc) root.style.setProperty('--hero-title-size-pc', data.hero_title_size_pc);
+                    if (data.hero_title_size_mobile) root.style.setProperty('--hero-title-size-mobile', data.hero_title_size_mobile);
+                    if (data.hero_title_spacing_pc) root.style.setProperty('--hero-title-spacing-pc', data.hero_title_spacing_pc);
+                    if (data.hero_title_spacing_mobile) root.style.setProperty('--hero-title-spacing-mobile', data.hero_title_spacing_mobile);
+
+                    // Typography - Schedule
+                    if (data.schedule_size_pc) root.style.setProperty('--schedule-size-pc', data.schedule_size_pc);
+                    if (data.schedule_size_mobile) root.style.setProperty('--schedule-size-mobile', data.schedule_size_mobile);
+                    if (data.schedule_spacing_pc) root.style.setProperty('--schedule-spacing-pc', data.schedule_spacing_pc);
+                    if (data.schedule_spacing_mobile) root.style.setProperty('--schedule-spacing-mobile', data.schedule_spacing_mobile);
+
+                    // Typography - CTA Title
+                    if (data.cta_title_size_pc) root.style.setProperty('--cta-title-size-pc', data.cta_title_size_pc);
+                    if (data.cta_title_size_mobile) root.style.setProperty('--cta-title-size-mobile', data.cta_title_size_mobile);
+                    if (data.cta_title_spacing_pc) root.style.setProperty('--cta-title-spacing-pc', data.cta_title_spacing_pc);
+                    if (data.cta_title_spacing_mobile) root.style.setProperty('--cta-title-spacing-mobile', data.cta_title_spacing_mobile);
+
+                    // CTA Section
+                    if (data.cta_image_url) {
+                        root.style.setProperty('--cta-bg-image', `url('${data.cta_image_url}')`);
+                    }
+                    if (data.cta_overlay_opacity !== undefined && data.cta_overlay_opacity !== null) {
+                        const opacity = parseInt(data.cta_overlay_opacity) / 100;
+                        root.style.setProperty('--cta-overlay-opacity', opacity);
                     }
                 }
             } catch (error) {

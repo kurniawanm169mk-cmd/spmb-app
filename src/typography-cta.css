@@ -1,0 +1,83 @@
+/* Typography Settings */
+:root {
+    /* Defaults */
+    --hero-title-size-pc: 3.5rem;
+    --hero-title-size-mobile: 2rem;
+    --hero-title-spacing-pc: -0.02em;
+    --hero-title-spacing-mobile: -0.01em;
+
+    --schedule-size-pc: 1rem;
+    --schedule-size-mobile: 0.875rem;
+    --schedule-spacing-pc: 0em;
+    --schedule-spacing-mobile: 0em;
+
+    --cta-title-size-pc: 2.5rem;
+    --cta-title-size-mobile: 1.75rem;
+    --cta-title-spacing-pc: -0.01em;
+    --cta-title-spacing-mobile: 0em;
+
+    --cta-bg-image: none;
+    --cta-overlay-opacity: 0.8;
+}
+
+/* Responsive Classes */
+
+/* Hero Title */
+.hero-title {
+    font-size: var(--hero-title-size-mobile);
+    letter-spacing: var(--hero-title-spacing-mobile);
+    line-height: 1.2;
+}
+
+@media (min-width: 768px) {
+    .hero-title {
+        font-size: var(--hero-title-size-pc);
+        letter-spacing: var(--hero-title-spacing-pc);
+    }
+}
+
+/* Schedule Text */
+.schedule-text {
+    font-size: var(--schedule-size-mobile);
+    letter-spacing: var(--schedule-spacing-mobile);
+}
+
+@media (min-width: 768px) {
+    .schedule-text {
+        font-size: var(--schedule-size-pc);
+        letter-spacing: var(--schedule-spacing-pc);
+    }
+}
+
+/* CTA Title */
+.cta-title {
+    font-size: var(--cta-title-size-mobile);
+    letter-spacing: var(--cta-title-spacing-mobile);
+}
+
+@media (min-width: 768px) {
+    .cta-title {
+        font-size: var(--cta-title-size-pc);
+        letter-spacing: var(--cta-title-spacing-pc);
+    }
+}
+
+/* CTA Background */
+.cta-section-bg {
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    background-image: var(--cta-bg-image, none);
+}
+
+.cta-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, var(--cta-overlay-opacity, 0.8));
+    z-index: 0;
+}
+
+.cta-content {
+    position: relative;
+    z-index: 1;
+}

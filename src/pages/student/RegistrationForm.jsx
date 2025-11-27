@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 
 export default function RegistrationForm({ registration, onUpdate }) {
     const [formData, setFormData] = useState(registration.form_data || {});
+    const [boardingType, setBoardingType] = useState(registration.boarding_type || 'Fullday');
     const [config, setConfig] = useState([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -58,11 +59,7 @@ export default function RegistrationForm({ registration, onUpdate }) {
                 .from('registrations')
                 .update({
                     form_data: formData,
-                    // If we want to auto-advance status, we can do it here or let admin verify.
-                    // Usually form filling doesn't change status unless it's the first time.
-                    // Let's assume status advances to 'documents_submitted' only after docs are uploaded.
-                    // Or maybe we have a separate 'form_submitted' status? 
-                    // For now, let's keep status as is, or maybe update updated_at.
+                    boarding_type: boardingType,
                     updated_at: new Date().toISOString()
                 })
                 .eq('id', registration.id);
@@ -84,6 +81,23 @@ export default function RegistrationForm({ registration, onUpdate }) {
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
             <h2 style={{ marginBottom: '1.5rem' }}>Formulir Pendaftaran</h2>
             <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '1.5rem' }}>
+
+                {/* Boarding Type Field */}
+                <div style={{ backgroundColor: '#f0fdfa', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--primary-color)' }}>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, color: 'var(--primary-color)' }}>
+                        Program Pilihan
+                    </label>
+                    <select
+                        value={boardingType}
+                        onChange={(e) => setBoardingType(e.target.value)}
+                        className="input"
+                        required
+                    >
+                        <option value="Fullday">Fullday (Pulang Pergi)</option>
+                        <option value="Boarding">Boarding (Asrama)</option>
+                    </select>
+                </div>
+
                 {config.map((field) => (
                     <div key={field.field_name}>
                         <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>

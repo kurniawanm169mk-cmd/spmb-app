@@ -99,7 +99,7 @@ export default function LandingPage() {
                                     style={{ width: 'clamp(80px, 15vw, 120px)', height: 'clamp(80px, 15vw, 120px)', objectFit: 'contain', marginBottom: '1.5rem', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.3))' }}
                                 />
                             )}
-                            <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: '800', marginBottom: '1rem', letterSpacing: '-0.02em', color: 'white', lineHeight: 1.2 }}>
+                            <h1 className="hero-title" style={{ fontWeight: '800', marginBottom: '1rem', color: 'white' }}>
                                 {schoolSettings?.school_name || 'SMPIT Ibnu Sina'}
                             </h1>
                             <p style={{ fontSize: 'clamp(1rem, 3vw, 1.5rem)', maxWidth: '700px', margin: '0 auto 2rem', color: '#f0fdfa' }}>
@@ -227,15 +227,16 @@ export default function LandingPage() {
                 </section>
 
                 {/* CTA Section */}
-                <section style={{ backgroundColor: 'var(--primary-color)', color: 'white', padding: '6rem 0', textAlign: 'center' }}>
-                    <div className="container">
+                <section className="cta-section-bg" style={{ backgroundColor: 'var(--primary-color)', color: 'white', padding: '6rem 0', textAlign: 'center' }}>
+                    <div className="cta-overlay"></div>
+                    <div className="container cta-content">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             whileInView={{ opacity: 1, scale: 1 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.5 }}
                         >
-                            <h2 style={{ marginBottom: '1.5rem', fontSize: '2.5rem', fontWeight: 'bold' }}>{schoolSettings?.cta_title || 'Siap Bergabung Bersama Kami?'}</h2>
+                            <h2 className="cta-title" style={{ marginBottom: '1.5rem', fontWeight: 'bold' }}>{schoolSettings?.cta_title || 'Siap Bergabung Bersama Kami?'}</h2>
                             <p style={{ marginBottom: '2.5rem', fontSize: '1.25rem', opacity: 0.9, maxWidth: '600px', margin: '0 auto 2.5rem' }}>
                                 {schoolSettings?.cta_description || 'Pendaftaran Tahun Ajaran Baru Telah Dibuka. Segera daftarkan putra-putri Anda untuk masa depan yang gemilang.'}
                             </p>
