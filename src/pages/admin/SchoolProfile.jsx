@@ -89,6 +89,7 @@ export default function SchoolProfile() {
             const root = document.documentElement;
             if (settings.primary_color) root.style.setProperty('--primary-color', settings.primary_color);
             if (settings.secondary_color) root.style.setProperty('--secondary-color', settings.secondary_color);
+            if (settings.font_family) root.style.setProperty('--font-primary', `'${settings.font_family}', sans-serif`);
 
             toast.success('Pengaturan berhasil disimpan!');
         } catch (err) {

@@ -65,14 +65,14 @@ export default function LandingPage() {
 
             <main style={{ flex: 1 }}>
                 {/* Hero Section - Full Screen */}
-                <section style={{ position: 'relative', overflow: 'hidden', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <section style={{ position: 'relative', overflow: 'hidden', minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {/* Background with Carousel */}
                     <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-                        <Carousel slides={carouselImages} height="100vh" />
+                        <Carousel slides={carouselImages} height="100dvh" />
                     </div>
 
                     {/* Overlay Content */}
-                    <div className="container" style={{ position: 'relative', zIndex: 1, textAlign: 'center', color: 'white', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
+                    <div className="container" style={{ position: 'relative', zIndex: 1, textAlign: 'center', color: 'white', textShadow: '0 2px 4px rgba(0,0,0,0.5)', padding: '0 1rem' }}>
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -86,13 +86,13 @@ export default function LandingPage() {
                                     transition={{ delay: 0.2, duration: 0.5 }}
                                     src={schoolSettings.logo_url}
                                     alt="Logo Sekolah"
-                                    style={{ width: '120px', height: '120px', objectFit: 'contain', marginBottom: '1.5rem', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.3))' }}
+                                    style={{ width: 'clamp(80px, 15vw, 120px)', height: 'clamp(80px, 15vw, 120px)', objectFit: 'contain', marginBottom: '1.5rem', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.3))' }}
                                 />
                             )}
-                            <h1 style={{ fontSize: '3.5rem', fontWeight: '800', marginBottom: '1rem', letterSpacing: '-0.02em', color: 'white' }}>
+                            <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: '800', marginBottom: '1rem', letterSpacing: '-0.02em', color: 'white', lineHeight: 1.2 }}>
                                 {schoolSettings?.school_name || 'SMPIT Ibnu Sina'}
                             </h1>
-                            <p style={{ fontSize: '1.5rem', maxWidth: '700px', margin: '0 auto 2rem', color: '#f0fdfa' }}>
+                            <p style={{ fontSize: 'clamp(1rem, 3vw, 1.5rem)', maxWidth: '700px', margin: '0 auto 2rem', color: '#f0fdfa' }}>
                                 {schoolSettings?.slogan || 'Generasi Islami, Unggul, Cerdas dan Berakhlak Mulia'}
                             </p>
 
@@ -244,6 +244,6 @@ export default function LandingPage() {
             </main>
 
             <Footer schoolSettings={schoolSettings} socialMedia={socials} />
-        </div>
+        </div >
     );
 }
