@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Save, Plus, Trash2, Upload, Facebook, Instagram, Youtube, Twitter, Globe } from 'lucide-react';
 import { toast } from 'sonner';
+import TypographySettings from '../../components/admin/TypographySettings';
+import CTASettings from '../../components/admin/CTASettings';
+import RegistrationFlowSettings from '../../components/admin/RegistrationFlowSettings';
 
 export default function SchoolProfile() {
     const [settings, setSettings] = useState({});
@@ -122,314 +125,311 @@ export default function SchoolProfile() {
             if (settings.id) {
                 await supabase.from('school_settings').update({ logo_url: publicUrl }).eq('id', settings.id);
             } else {
-                // If no ID, we can't update. We could insert, but maybe user hasn't filled other fields.
-                // Just let them click "Simpan".
-                toast.success('Logo diupload. Jangan lupa klik "Simpan Perubahan" untuk menyimpan ke database.');
-            }
-        } catch (err) {
-            console.error('Error uploading logo:', err);
-            alert(`Gagal upload logo: ${err.message}`);
-        }
-    };
+                if (!file) return;
 
-    const handleImageUpload = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+                try {
+                    const fileName = `carousel/${Date.now()}_${file.name}`;
+                    const { error: uploadError } = await supabase.storage.from('public-assets').upload(fileName, file);
+                    if (uploadError) throw uploadError;
 
-        try {
-            const fileName = `carousel/${Date.now()}_${file.name}`;
-            const { error: uploadError } = await supabase.storage.from('public-assets').upload(fileName, file);
-            if (uploadError) throw uploadError;
+                    const { data: { publicUrl } } = supabase.storage.from('public-assets').getPublicUrl(fileName);
 
-            const { data: { publicUrl } } = supabase.storage.from('public-assets').getPublicUrl(fileName);
+                    const { error: dbError } = await supabase.from('carousel_images').insert([{
+                        image_url: publicUrl,
+                        caption: '',
+                        order_index: carouselImages.length
+                    }]);
 
-            const { error: dbError } = await supabase.from('carousel_images').insert([{
-                image_url: publicUrl,
-                caption: '',
-                order_index: carouselImages.length
-            }]);
+                    if (dbError) throw dbError;
+                    fetchData();
+                } catch (err) {
+                    console.error('Error uploading image:', err);
+                    alert(`Gagal upload gambar: ${err.message}`);
+                }
+            };
 
-            if (dbError) throw dbError;
-            fetchData();
-        } catch (err) {
-            console.error('Error uploading image:', err);
-            alert(`Gagal upload gambar: ${err.message}`);
-        }
-    };
+            const deleteImage = async (id) => {
+                if (!confirm('Hapus gambar ini?')) return;
+                try {
+                    await supabase.from('carousel_images').delete().eq('id', id);
+                    fetchData();
+                } catch (err) {
+                    console.error('Error deleting image:', err);
+                }
+            };
 
-    const deleteImage = async (id) => {
-        if (!confirm('Hapus gambar ini?')) return;
-        try {
-            await supabase.from('carousel_images').delete().eq('id', id);
-            fetchData();
-        } catch (err) {
-            console.error('Error deleting image:', err);
-        }
-    };
+            // Social Media Logic
+            const addSocial = async () => {
+                const platform = prompt('Nama Platform (Facebook, Instagram, Youtube, Twitter, Website):');
+                if (!platform) return;
+                const url = prompt('Link URL:');
+                if (!url) return;
 
-    // Social Media Logic
-    const addSocial = async () => {
-        const platform = prompt('Nama Platform (Facebook, Instagram, Youtube, Twitter, Website):');
-        if (!platform) return;
-        const url = prompt('Link URL:');
-        if (!url) return;
+                try {
+                    const { error } = await supabase.from('social_media').insert([{ platform_name: platform, platform_url: url }]);
+                    if (error) throw error;
+                    fetchData();
+                } catch (err) {
+                    console.error('Error adding social:', err);
+                    toast.error('Gagal menambah sosial media.');
+                }
+            };
 
-        try {
-            const { error } = await supabase.from('social_media').insert([{ platform_name: platform, platform_url: url }]);
-            if (error) throw error;
-            fetchData();
-        } catch (err) {
-            console.error('Error adding social:', err);
-            toast.error('Gagal menambah sosial media.');
-        }
-    };
+            const deleteSocial = async (id) => {
+                if (!confirm('Hapus sosial media ini?')) return;
+                try {
+                    await supabase.from('social_media').delete().eq('id', id);
+                    fetchData();
+                } catch (err) {
+                    console.error('Error deleting social:', err);
+                }
+            };
 
-    const deleteSocial = async (id) => {
-        if (!confirm('Hapus sosial media ini?')) return;
-        try {
-            await supabase.from('social_media').delete().eq('id', id);
-            fetchData();
-        } catch (err) {
-            console.error('Error deleting social:', err);
-        }
-    };
+            if (loading) return <div>Loading...</div>;
 
-    if (loading) return <div>Loading...</div>;
+            return (
+                <div style={{ maxWidth: '800px' }}>
+                    <h1 style={{ marginBottom: '2rem' }}>Profil Sekolah & Tampilan</h1>
 
-    return (
-        <div style={{ maxWidth: '800px' }}>
-            <h1 style={{ marginBottom: '2rem' }}>Profil Sekolah & Tampilan</h1>
+                    {/* General Settings */}
+                    <div className="card" style={{ marginBottom: '2rem' }}>
+                        <h3 style={{ marginBottom: '1.5rem' }}>Informasi Dasar</h3>
 
-            {/* General Settings */}
-            <div className="card" style={{ marginBottom: '2rem' }}>
-                <h3 style={{ marginBottom: '1.5rem' }}>Informasi Dasar</h3>
+                        <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                            <div style={{ width: '100px', height: '100px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8fafc' }}>
+                                {settings.logo_url ? (
+                                    <img src={settings.logo_url} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                                ) : (
+                                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>No Logo</span>
+                                )}
+                            </div>
+                            <div>
+                                <input type="file" id="logo-upload" style={{ display: 'none' }} onChange={handleLogoUpload} accept="image/*" />
+                                <label htmlFor="logo-upload" className="btn btn-outline" style={{ cursor: 'pointer' }}>
+                                    <Upload size={18} /> Upload Logo
+                                </label>
+                                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>Format: PNG, JPG (Max 2MB)</p>
+                            </div>
+                        </div>
 
-                <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                    <div style={{ width: '100px', height: '100px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8fafc' }}>
-                        {settings.logo_url ? (
-                            <img src={settings.logo_url} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                        ) : (
-                            <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>No Logo</span>
-                        )}
+                        <div style={{ display: 'grid', gap: '1rem' }}>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '0.5rem' }}>Nama Sekolah</label>
+                                <input type="text" name="school_name" value={settings.school_name || ''} onChange={handleSettingsChange} className="input" />
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '0.5rem' }}>Slogan</label>
+                                <input type="text" name="slogan" value={settings.slogan || ''} onChange={handleSettingsChange} className="input" />
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '0.5rem' }}>Alamat</label>
+                                <textarea name="address" value={settings.address || ''} onChange={handleSettingsChange} className="input" rows={3} />
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '0.5rem' }}>No Telepon</label>
+                                <input type="text" name="contact_phone" value={settings.contact_phone || ''} onChange={handleSettingsChange} className="input" />
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '0.5rem' }}>Google Maps URL (Embed)</label>
+                                <input type="text" name="google_maps_url" value={settings.google_maps_url || ''} onChange={handleSettingsChange} className="input" placeholder="https://www.google.com/maps/embed?..." />
+                            </div>
+
+                            <hr style={{ margin: '1rem 0', border: 'none', borderTop: '1px solid var(--border-color)' }} />
+
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '0.5rem' }}>Judul CTA (Halaman Depan)</label>
+                                <input type="text" name="cta_title" value={settings.cta_title || ''} onChange={handleSettingsChange} className="input" placeholder="Siap Bergabung Bersama Kami?" />
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '0.5rem' }}>Deskripsi CTA (Halaman Depan)</label>
+                                <textarea name="cta_description" value={settings.cta_description || ''} onChange={handleSettingsChange} className="input" rows={3} placeholder="Pendaftaran Tahun Ajaran Baru Telah Dibuka..." />
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <input type="file" id="logo-upload" style={{ display: 'none' }} onChange={handleLogoUpload} accept="image/*" />
-                        <label htmlFor="logo-upload" className="btn btn-outline" style={{ cursor: 'pointer' }}>
-                            <Upload size={18} /> Upload Logo
-                        </label>
-                        <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>Format: PNG, JPG (Max 2MB)</p>
-                    </div>
-                </div>
 
-                <div style={{ display: 'grid', gap: '1rem' }}>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Nama Sekolah</label>
-                        <input type="text" name="school_name" value={settings.school_name || ''} onChange={handleSettingsChange} className="input" />
-                    </div>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Slogan</label>
-                        <input type="text" name="slogan" value={settings.slogan || ''} onChange={handleSettingsChange} className="input" />
-                    </div>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Alamat</label>
-                        <textarea name="address" value={settings.address || ''} onChange={handleSettingsChange} className="input" rows={3} />
-                    </div>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>No Telepon</label>
-                        <input type="text" name="contact_phone" value={settings.contact_phone || ''} onChange={handleSettingsChange} className="input" />
-                    </div>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Google Maps URL (Embed)</label>
-                        <input type="text" name="google_maps_url" value={settings.google_maps_url || ''} onChange={handleSettingsChange} className="input" placeholder="https://www.google.com/maps/embed?..." />
+                    {/* Social Media Settings */}
+                    <div className="card" style={{ marginBottom: '2rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                            <h3 style={{ margin: 0 }}>Sosial Media</h3>
+                            <button onClick={addSocial} className="btn btn-outline" style={{ padding: '0.25rem 0.75rem' }}>
+                                <Plus size={16} /> Tambah
+                            </button>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            {socials.map(social => (
+                                <div key={social.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem', backgroundColor: '#f8fafc', borderRadius: 'var(--radius-md)' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                        {social.platform_name.toLowerCase().includes('facebook') ? <Facebook size={20} /> :
+                                            social.platform_name.toLowerCase().includes('instagram') ? <Instagram size={20} /> :
+                                                social.platform_name.toLowerCase().includes('youtube') ? <Youtube size={20} /> :
+                                                    social.platform_name.toLowerCase().includes('twitter') ? <Twitter size={20} /> :
+                                                        <Globe size={20} />}
+                                        <div>
+                                            <p style={{ fontWeight: 500 }}>{social.platform_name}</p>
+                                            <a href={social.platform_url} target="_blank" rel="noreferrer" style={{ fontSize: '0.875rem', color: 'var(--primary-color)' }}>{social.platform_url}</a>
+                                        </div>
+                                    </div>
+                                    <button onClick={() => deleteSocial(social.id)} style={{ color: 'var(--error)', background: 'none', border: 'none', cursor: 'pointer' }}>
+                                        <Trash2 size={18} />
+                                    </button>
+                                </div>
+                            ))}
+                            {socials.length === 0 && <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>Belum ada sosial media.</p>}
+                        </div>
                     </div>
 
-                    <hr style={{ margin: '1rem 0', border: 'none', borderTop: '1px solid var(--border-color)' }} />
-
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Judul CTA (Halaman Depan)</label>
-                        <input type="text" name="cta_title" value={settings.cta_title || ''} onChange={handleSettingsChange} className="input" placeholder="Siap Bergabung Bersama Kami?" />
-                    </div>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Deskripsi CTA (Halaman Depan)</label>
-                        <textarea name="cta_description" value={settings.cta_description || ''} onChange={handleSettingsChange} className="input" rows={3} placeholder="Pendaftaran Tahun Ajaran Baru Telah Dibuka..." />
-                    </div>
-                </div>
-            </div>
-
-            {/* Social Media Settings */}
-            <div className="card" style={{ marginBottom: '2rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                    <h3 style={{ margin: 0 }}>Sosial Media</h3>
-                    <button onClick={addSocial} className="btn btn-outline" style={{ padding: '0.25rem 0.75rem' }}>
-                        <Plus size={16} /> Tambah
-                    </button>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    {socials.map(social => (
-                        <div key={social.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem', backgroundColor: '#f8fafc', borderRadius: 'var(--radius-md)' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                {social.platform_name.toLowerCase().includes('facebook') ? <Facebook size={20} /> :
-                                    social.platform_name.toLowerCase().includes('instagram') ? <Instagram size={20} /> :
-                                        social.platform_name.toLowerCase().includes('youtube') ? <Youtube size={20} /> :
-                                            social.platform_name.toLowerCase().includes('twitter') ? <Twitter size={20} /> :
-                                                <Globe size={20} />}
-                                <div>
-                                    <p style={{ fontWeight: 500 }}>{social.platform_name}</p>
-                                    <a href={social.platform_url} target="_blank" rel="noreferrer" style={{ fontSize: '0.875rem', color: 'var(--primary-color)' }}>{social.platform_url}</a>
+                    {/* Theme Settings */}
+                    <div className="card" style={{ marginBottom: '2rem' }}>
+                        <h3 style={{ marginBottom: '1.5rem' }}>Tema Warna</h3>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '0.5rem' }}>Warna Utama</label>
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <input type="color" name="primary_color" value={settings.primary_color || '#10b981'} onChange={handleSettingsChange} style={{ height: '40px', width: '60px' }} />
+                                    <input type="text" name="primary_color" value={settings.primary_color || '#10b981'} onChange={handleSettingsChange} className="input" />
                                 </div>
                             </div>
-                            <button onClick={() => deleteSocial(social.id)} style={{ color: 'var(--error)', background: 'none', border: 'none', cursor: 'pointer' }}>
-                                <Trash2 size={18} />
-                            </button>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '0.5rem' }}>Warna Sekunder</label>
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <input type="color" name="secondary_color" value={settings.secondary_color || '#059669'} onChange={handleSettingsChange} style={{ height: '40px', width: '60px' }} />
+                                    <input type="text" name="secondary_color" value={settings.secondary_color || '#059669'} onChange={handleSettingsChange} className="input" />
+                                </div>
+                            </div>
                         </div>
-                    ))}
-                    {socials.length === 0 && <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>Belum ada sosial media.</p>}
-                </div>
-            </div>
 
-            {/* Theme Settings */}
-            <div className="card" style={{ marginBottom: '2rem' }}>
-                <h3 style={{ marginBottom: '1.5rem' }}>Tema Warna</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Warna Utama</label>
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <input type="color" name="primary_color" value={settings.primary_color || '#10b981'} onChange={handleSettingsChange} style={{ height: '40px', width: '60px' }} />
-                            <input type="text" name="primary_color" value={settings.primary_color || '#10b981'} onChange={handleSettingsChange} className="input" />
-                        </div>
-                    </div>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Warna Sekunder</label>
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <input type="color" name="secondary_color" value={settings.secondary_color || '#059669'} onChange={handleSettingsChange} style={{ height: '40px', width: '60px' }} />
-                            <input type="text" name="secondary_color" value={settings.secondary_color || '#059669'} onChange={handleSettingsChange} className="input" />
-                        </div>
-                    </div>
-                </div>
+                        <hr style={{ margin: '1.5rem 0', border: 'none', borderTop: '1px solid var(--border-color)' }} />
 
-                <hr style={{ margin: '1.5rem 0', border: 'none', borderTop: '1px solid var(--border-color)' }} />
-
-                <h4 style={{ marginBottom: '1rem', fontSize: '1.125rem' }}>Tipografi</h4>
-                <div>
-                    <label style={{ display: 'block', marginBottom: '0.5rem' }}>Jenis Font</label>
-                    <select
-                        name="font_family"
-                        value={settings.font_family || 'Inter'}
-                        onChange={handleSettingsChange}
-                        className="input"
-                    >
-                        <option value="Inter">Inter (Clean & Professional)</option>
-                        <option value="Poppins">Poppins (Modern & Geometric)</option>
-                        <option value="Nunito">Nunito (Rounded & Friendly)</option>
-                        <option value="Outfit">Outfit (Stylish & Modern)</option>
-                        <option value="DM Serif Display">DM Serif Display (Classic & Elegant)</option>
-                    </select>
-                    <p style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-                        Pilih font yang sesuai dengan karakter sekolah Anda.
-                    </p>
-                </div>
-
-                <hr style={{ margin: '1.5rem 0', border: 'none', borderTop: '1px solid var(--border-color)' }} />
-
-                <h4 style={{ marginBottom: '1rem', fontSize: '1.125rem' }}>Tampilan Sudut (Rounded)</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
-                    {['0px', '0.5rem', '1rem', '2rem'].map((radius, index) => (
-                        <button
-                            key={radius}
-                            onClick={() => handleSettingsChange({ target: { name: 'border_radius', value: radius } })}
-                            style={{
-                                padding: '0.75rem',
-                                border: `2px solid ${settings.border_radius === radius ? 'var(--primary-color)' : 'var(--border-color)'}`,
-                                borderRadius: radius,
-                                backgroundColor: settings.border_radius === radius ? 'var(--primary-color)' : 'white',
-                                color: settings.border_radius === radius ? 'white' : 'var(--text-primary)',
-                                cursor: 'pointer',
-                                fontWeight: '600'
-                            }}
-                        >
-                            {['Kotak', 'Sedikit', 'Sedang', 'Bulat'][index]}
-                        </button>
-                    ))}
-                </div>
-
-                <hr style={{ margin: '1.5rem 0', border: 'none', borderTop: '1px solid var(--border-color)' }} />
-
-                <h4 style={{ marginBottom: '1rem', fontSize: '1.125rem' }}>Hero Section</h4>
-                <div style={{ display: 'grid', gap: '1.5rem' }}>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>
-                            Kegelapan Overlay ({settings.hero_overlay_opacity || 50}%)
-                        </label>
-                        <input
-                            type="range"
-                            name="hero_overlay_opacity"
-                            min="0"
-                            max="90"
-                            value={settings.hero_overlay_opacity || 50}
-                            onChange={handleSettingsChange}
-                            style={{ width: '100%', accentColor: 'var(--primary-color)' }}
-                        />
-                    </div>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>
-                            Blur Background ({settings.hero_blur || 0}px)
-                        </label>
-                        <input
-                            type="range"
-                            name="hero_blur"
-                            min="0"
-                            max="10"
-                            value={settings.hero_blur || 0}
-                            onChange={handleSettingsChange}
-                            style={{ width: '100%', accentColor: 'var(--primary-color)' }}
-                        />
-                    </div>
-                </div>
-            </div>
-
-            <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
-                <button onClick={saveSettings} className="btn btn-primary" disabled={saving}>
-                    <Save size={18} /> {saving ? 'Menyimpan...' : 'Simpan Perubahan'}
-                </button>
-            </div>
-
-            {/* Carousel Management */}
-            <div className="card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                    <h3>Foto Carousel</h3>
-                    <div>
-                        <input type="file" id="carousel-upload" style={{ display: 'none' }} onChange={handleImageUpload} accept="image/*" />
-                        <label htmlFor="carousel-upload" className="btn btn-outline" style={{ cursor: 'pointer' }}>
-                            <Plus size={18} /> Tambah Foto
-                        </label>
-                    </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '1rem' }}>
-                    {carouselImages.map((img) => (
-                        <div key={img.id} style={{ position: 'relative', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
-                            <img src={img.image_url} alt="Carousel" style={{ width: '100%', height: '100px', objectFit: 'cover' }} />
-                            <button
-                                onClick={() => deleteImage(img.id)}
-                                style={{
-                                    position: 'absolute',
-                                    top: '0.25rem',
-                                    right: '0.25rem',
-                                    backgroundColor: 'rgba(255,0,0,0.8)',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '50%',
-                                    padding: '0.25rem',
-                                    cursor: 'pointer'
-                                }}
+                        <h4 style={{ marginBottom: '1rem', fontSize: '1.125rem' }}>Tipografi</h4>
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '0.5rem' }}>Jenis Font</label>
+                            <select
+                                name="font_family"
+                                value={settings.font_family || 'Inter'}
+                                onChange={handleSettingsChange}
+                                className="input"
                             >
-                                <Trash2 size={14} />
-                            </button>
+                                <option value="Inter">Inter (Clean & Professional)</option>
+                                <option value="Poppins">Poppins (Modern & Geometric)</option>
+                                <option value="Nunito">Nunito (Rounded & Friendly)</option>
+                                <option value="Outfit">Outfit (Stylish & Modern)</option>
+                                <option value="DM Serif Display">DM Serif Display (Classic & Elegant)</option>
+                            </select>
+                            <p style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                                Pilih font yang sesuai dengan karakter sekolah Anda.
+                            </p>
                         </div>
-                    ))}
-                    {carouselImages.length === 0 && <p style={{ color: 'var(--text-secondary)' }}>Belum ada foto.</p>}
-                </div>
-            </div>
-        </div >
-    );
-}
+
+                        <hr style={{ margin: '1.5rem 0', border: 'none', borderTop: '1px solid var(--border-color)' }} />
+
+                        <h4 style={{ marginBottom: '1rem', fontSize: '1.125rem' }}>Tampilan Sudut (Rounded)</h4>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
+                            {['0px', '0.5rem', '1rem', '2rem'].map((radius, index) => (
+                                <button
+                                    key={radius}
+                                    onClick={() => handleSettingsChange({ target: { name: 'border_radius', value: radius } })}
+                                    style={{
+                                        padding: '0.75rem',
+                                        border: `2px solid ${settings.border_radius === radius ? 'var(--primary-color)' : 'var(--border-color)'}`,
+                                        borderRadius: radius,
+                                        backgroundColor: settings.border_radius === radius ? 'var(--primary-color)' : 'white',
+                                        color: settings.border_radius === radius ? 'white' : 'var(--text-primary)',
+                                        cursor: 'pointer',
+                                        fontWeight: '600'
+                                    }}
+                                >
+                                    {['Kotak', 'Sedikit', 'Sedang', 'Bulat'][index]}
+                                </button>
+                            ))}
+                        </div>
+
+                        <hr style={{ margin: '1.5rem 0', border: 'none', borderTop: '1px solid var(--border-color)' }} />
+
+                        <h4 style={{ marginBottom: '1rem', fontSize: '1.125rem' }}>Hero Section</h4>
+                        <div style={{ display: 'grid', gap: '1.5rem' }}>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '0.5rem' }}>
+                                    Kegelapan Overlay ({settings.hero_overlay_opacity || 50}%)
+                                </label>
+                                <input
+                                    type="range"
+                                    name="hero_overlay_opacity"
+                                    min="0"
+                                    max="90"
+                                    value={settings.hero_overlay_opacity || 50}
+                                    onChange={handleSettingsChange}
+                                    style={{ width: '100%', accentColor: 'var(--primary-color)' }}
+                                />
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '0.5rem' }}>
+                                    Blur Background ({settings.hero_blur || 0}px)
+                                </label>
+                                <input
+                                    type="range"
+                                    name="hero_blur"
+                                    min="0"
+                                    max="10"
+                                    value={settings.hero_blur || 0}
+                                    onChange={handleSettingsChange}
+                                    style={{ width: '100%', accentColor: 'var(--primary-color)' }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Typography Settings Component */}
+                    <TypographySettings settings={settings} handleSettingsChange={handleSettingsChange} />
+
+                    {/* CTA Settings Component */}
+                    <CTASettings settings={settings} setSettings={setSettings} handleSettingsChange={handleSettingsChange} />
+
+                    {/* Registration Flow Component */}
+                    <RegistrationFlowSettings />
+
+                    <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
+                        <button onClick={saveSettings} className="btn btn-primary" disabled={saving}>
+                            <Save size={18} /> {saving ? 'Menyimpan...' : 'Simpan Perubahan'}
+                        </button>
+                    </div>
+
+                    {/* Carousel Management */}
+                    <div className="card">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                            <h3>Foto Carousel</h3>
+                            <div>
+                                <input type="file" id="carousel-upload" style={{ display: 'none' }} onChange={handleImageUpload} accept="image/*" />
+                                <label htmlFor="carousel-upload" className="btn btn-outline" style={{ cursor: 'pointer' }}>
+                                    <Plus size={18} /> Tambah Foto
+                                </label>
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '1rem' }}>
+                            {carouselImages.map((img) => (
+                                <div key={img.id} style={{ position: 'relative', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
+                                    <img src={img.image_url} alt="Carousel" style={{ width: '100%', height: '100px', objectFit: 'cover' }} />
+                                    <button
+                                        onClick={() => deleteImage(img.id)}
+                                        style={{
+                                            position: 'absolute',
+                                            top: '0.25rem',
+                                            right: '0.25rem',
+                                            backgroundColor: 'rgba(255,0,0,0.8)',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '50%',
+                                            padding: '0.25rem',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        <Trash2 size={14} />
+                                    </button>
+                                </div>
+                            ))}
+                            {carouselImages.length === 0 && <p style={{ color: 'var(--text-secondary)' }}>Belum ada foto.</p>}
+                        </div>
+                    </div>
+                </div >
+            );
+        }

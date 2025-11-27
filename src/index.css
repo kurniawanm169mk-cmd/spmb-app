@@ -22,7 +22,6 @@
 
   /* Global Radius Setting */
   --radius-global: 1rem;
-  /* Default */
 
   /* Shadows - Softer & Diffused */
   --shadow-sm: 0 2px 4px rgb(0 0 0 / 0.02);
@@ -32,7 +31,30 @@
 
   /* Fonts */
   --font-primary: 'Inter', sans-serif;
-  /* Default */
+
+  /* Typography - Header/Navbar */
+  --header-size-pc: 1.5rem;
+  --header-size-mobile: 1.25rem;
+  --header-spacing-pc: 0em;
+  --header-spacing-mobile: 0em;
+
+  /* Typography - Hero Title */
+  --hero-title-size-pc: 3.5rem;
+  --hero-title-size-mobile: 2rem;
+  --hero-title-spacing-pc: -0.02em;
+  --hero-title-spacing-mobile: -0.01em;
+
+  /* Typography - Schedule/Calendar */
+  --schedule-size-pc: 1rem;
+  --schedule-size-mobile: 0.875rem;
+  --schedule-spacing-pc: 0em;
+  --schedule-spacing-mobile: 0em;
+
+  /* Typography - CTA Title */
+  --cta-title-size-pc: 2.5rem;
+  --cta-title-size-mobile: 1.75rem;
+  --cta-title-spacing-pc: 0em;
+  --cta-title-spacing-mobile: 0em;
 }
 
 body {
@@ -142,4 +164,37 @@ button {
 .card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-xl);
+}
+
+/* Responsive Typography Classes */
+.hero-title {
+  font-size: var(--hero-title-size-mobile);
+  letter-spacing: var(--hero-title-spacing-mobile);
+}
+
+.schedule-text {
+  font-size: var(--schedule-size-mobile);
+  letter-spacing: var(--schedule-spacing-mobile);
+}
+
+.cta-title {
+  font-size: var(--cta-title-size-mobile);
+  letter-spacing: var(--cta-title-spacing-mobile);
+}
+
+@media (min-width: 768px) {
+  .hero-title {
+    font-size: var(--hero-title-size-pc);
+    letter-spacing: var(--hero-title-spacing-pc);
+  }
+
+  .schedule-text {
+    font-size: var(--schedule-size-pc);
+    letter-spacing: var(--schedule-spacing-pc);
+  }
+
+  .cta-title {
+    font-size: var(--cta-title-size-pc);
+    letter-spacing: var(--cta-title-spacing-pc);
+  }
 }
