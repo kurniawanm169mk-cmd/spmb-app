@@ -219,7 +219,7 @@ export default function LandingPage() {
                 </section>
             </main>
 
-            <Footer schoolSettings={schoolSettings} socials={socials} />
+            <Footer schoolSettings={schoolSettings} socialMedia={socials} />
         </div>
     );
 }
