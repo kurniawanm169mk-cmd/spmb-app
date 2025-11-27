@@ -43,6 +43,20 @@ function App() {
                     // Update Font Family
                     if (data.font_family) {
                         root.style.setProperty('--font-primary', `'${data.font_family}', sans-serif`);
+
+                        // Dynamically load Google Font
+                        const fontName = data.font_family.replace(/\s+/g, '+');
+                        const linkId = 'dynamic-font-link';
+                        let link = document.getElementById(linkId);
+
+                        if (!link) {
+                            link = document.createElement('link');
+                            link.id = linkId;
+                            link.rel = 'stylesheet';
+                            document.head.appendChild(link);
+                        }
+
+                        link.href = `https://fonts.googleapis.com/css2?family=${fontName}:wght@300;400;500;600;700&display=swap`;
                     }
 
                     // Update Border Radius

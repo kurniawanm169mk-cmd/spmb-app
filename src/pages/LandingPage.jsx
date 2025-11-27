@@ -116,7 +116,7 @@ export default function LandingPage() {
                                         padding: '0.75rem 1.5rem',
                                         backgroundColor: 'rgba(255, 255, 255, 0.9)',
                                         backdropFilter: 'blur(4px)',
-                                        borderRadius: 'var(--radius-full)',
+                                        borderRadius: 'var(--radius-global)',
                                         display: 'inline-flex',
                                         alignItems: 'center',
                                         gap: '0.5rem',
@@ -126,7 +126,7 @@ export default function LandingPage() {
                                     }}
                                 >
                                     <Calendar size={20} />
-                                    <span style={{ fontWeight: 600 }}>
+                                    <span className="schedule-text" style={{ fontWeight: 600 }}>
                                         Pendaftaran: {new Date(schoolSettings.registration_start_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long' })} - {new Date(schoolSettings.registration_end_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                                     </span>
                                 </motion.div>

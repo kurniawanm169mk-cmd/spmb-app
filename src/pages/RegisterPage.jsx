@@ -70,7 +70,11 @@ export default function RegisterPage() {
                 const fileExt = paymentFile.name.split('.').pop();
                 const fileName = `${user.id}/payment_proof_${Date.now()}.${fileExt}`;
 
-                if (uploadError) throw uploadError;
+                const { error: uploadErr } = await supabase.storage
+                    .from('payment_proofs')
+                    .upload(fileName, paymentFile);
+
+                if (uploadErr) throw uploadErr;
                 filePath = fileName;
             }
 
