@@ -199,6 +199,27 @@ Mohon dicek. Terima kasih.`;
                     </motion.div>
                 )}
 
+                <form onSubmit={handleSubmit}>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Nama Lengkap Siswa</label>
+                        <input
+                            type="text"
+                            required
+                            className="input"
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
+                            placeholder="Sesuai Ijazah / Akta Kelahiran"
+                        />
+                    </div>
+
+                    <div style={{ marginTop: '1rem' }}>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>No. WhatsApp / HP</label>
+                        <input
+                            type="tel"
+                            required
+                            className="input"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
                             placeholder="Contoh: 081234567890"
                         />
                         <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
@@ -206,7 +227,7 @@ Mohon dicek. Terima kasih.`;
                         </p>
                     </div>
 
-                    <div>
+                    <div style={{ marginTop: '1rem' }}>
                         <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Email</label>
                         <input
                             type="email"
@@ -218,36 +239,49 @@ Mohon dicek. Terima kasih.`;
                         />
                     </div>
 
+                    <div style={{ marginTop: '1rem' }}>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Program Pilihan</label>
+                        <select
+                            className="input"
+                            value={boardingType}
+                            onChange={(e) => setBoardingType(e.target.value)}
+                            required
+                        >
+                            <option value="Fullday">Fullday</option>
+                            <option value="Boarding">Boarding</option>
+                        </select>
+                    </div>
+
                     <hr style={{ margin: '1rem 0', border: 'none', borderTop: '1px solid var(--border-color)' }} />
 
-                    {/* Payment Info */ }
-    <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
-        <h3 style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <CreditCard size={18} /> Informasi Pembayaran
-        </h3>
+                    {/* Payment Info */}
+                    <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
+                        <h3 style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <CreditCard size={18} /> Informasi Pembayaran
+                        </h3>
 
-        <div style={{ display: 'grid', gap: '0.5rem', fontSize: '0.875rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: 'var(--text-secondary)' }}>Biaya Pendaftaran:</span>
-                <span style={{ fontWeight: 'bold' }}>Rp {parseInt(schoolSettings?.registration_fee || 0).toLocaleString('id-ID')}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: 'var(--text-secondary)' }}>Bank:</span>
-                <span style={{ fontWeight: 'bold' }}>{schoolSettings?.bank_name || '-'}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: 'var(--text-secondary)' }}>No. Rekening:</span>
-                <span style={{ fontWeight: 'bold' }}>{schoolSettings?.bank_account_number || '-'}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: 'var(--text-secondary)' }}>Atas Nama:</span>
-                <span style={{ fontWeight: 'bold' }}>{schoolSettings?.bank_account_holder || '-'}</span>
-            </div>
-        </div>
-    </div>
+                        <div style={{ display: 'grid', gap: '0.5rem', fontSize: '0.875rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <span style={{ color: 'var(--text-secondary)' }}>Biaya Pendaftaran:</span>
+                                <span style={{ fontWeight: 'bold' }}>Rp {parseInt(schoolSettings?.registration_fee || 0).toLocaleString('id-ID')}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <span style={{ color: 'var(--text-secondary)' }}>Bank:</span>
+                                <span style={{ fontWeight: 'bold' }}>{schoolSettings?.bank_name || '-'}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <span style={{ color: 'var(--text-secondary)' }}>No. Rekening:</span>
+                                <span style={{ fontWeight: 'bold' }}>{schoolSettings?.bank_account_number || '-'}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <span style={{ color: 'var(--text-secondary)' }}>Atas Nama:</span>
+                                <span style={{ fontWeight: 'bold' }}>{schoolSettings?.bank_account_holder || '-'}</span>
+                            </div>
+                        </div>
+                    </div>
 
-    {/* Upload Proof */ }
-                    <div>
+                    {/* Upload Proof */}
+                    <div style={{ marginTop: '1rem' }}>
                         <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Upload Bukti Transfer</label>
                         <div style={{ border: '2px dashed var(--border-color)', padding: '1.5rem', borderRadius: 'var(--radius-md)', textAlign: 'center', cursor: 'pointer', backgroundColor: 'white' }} onClick={() => document.getElementById('proof-upload').click()}>
                             <Upload size={24} style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem' }} />
@@ -266,21 +300,27 @@ Mohon dicek. Terima kasih.`;
                         />
                     </div>
 
-                    <button type="submit" className="btn btn-primary" disabled={loading || !!error} style={{ marginTop: '0.5rem', opacity: (loading || !!error) ? 0.7 : 1 }}>
+                    <button type="submit" className="btn btn-primary" disabled={loading || !!error} style={{ marginTop: '1.5rem', width: '100%', opacity: (loading || !!error) ? 0.7 : 1 }}>
                         {loading ? 'Sedang memproses...' : 'Daftar & Kirim Bukti'}
                     </button>
-                </form >
+                </form>
 
-        <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem' }}>
-            <p style={{ color: 'var(--text-secondary)' }}>
-                Sudah punya akun? <Link to="/login" style={{ color: 'var(--primary-color)', fontWeight: 500 }}>Masuk disini</Link>
-            </p>
-            <div style={{ marginTop: '1rem' }}>
-                <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
-                    <ArrowLeft size={16} /> Kembali ke Beranda
-                </Link>
-            </div>
+                <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem' }}>
+                    <p style={{ color: 'var(--text-secondary)' }}>
+                        Sudah punya akun? <Link to="/login" style={{ color: 'var(--primary-color)', fontWeight: 500 }}>Masuk disini</Link>
+                    </p>
+                    <div style={{ marginTop: '1rem' }}>
+                        <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
+                            <ArrowLeft size={16} /> Kembali ke Beranda
+                        </Link>
+                    </div>
+                </div>
+            </motion.div>
         </div>
+    );
+                </Link >
+            </div >
+        </div >
             </motion.div >
         </div >
     );
