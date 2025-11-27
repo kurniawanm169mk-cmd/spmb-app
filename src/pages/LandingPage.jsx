@@ -212,7 +212,7 @@ export default function LandingPage() {
                         <p className="cta-description" style={{ fontSize: '1.25rem', marginBottom: '2.5rem', maxWidth: '600px', margin: '0 auto 2.5rem', opacity: 0.9 }}>
                             {schoolSettings?.cta_description || 'Daftarkan putra-putri Anda sekarang dan jadilah bagian dari keluarga besar kami.'}
                         </p>
-                        <Link to="/register" className="btn" style={{ backgroundColor: 'white', color: 'var(--primary-color)', padding: '1rem 2.5rem', fontSize: '1.125rem' }}>
+                        <Link to="/register" className="btn" style={{ backgroundColor: 'white', color: 'var(--primary-color)', padding: '1rem 2.5rem', fontSize: '1.125rem', border: '2px solid white', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
                             {schoolSettings?.cta_button_text || 'Daftar Sekarang'}
                         </Link>
                     </div>
