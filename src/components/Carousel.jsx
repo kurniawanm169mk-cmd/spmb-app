@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-const Carousel = ({ slides = [] }) => {
+const Carousel = ({ slides = [], height = '500px' }) => {
     const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
     const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -30,7 +30,7 @@ const Carousel = ({ slides = [] }) => {
     if (!slides || slides.length === 0) {
         return (
             <div className="carousel-placeholder" style={{
-                height: '500px',
+                height: height,
                 backgroundColor: '#e2e8f0',
                 display: 'flex',
                 alignItems: 'center',
@@ -43,17 +43,17 @@ const Carousel = ({ slides = [] }) => {
     }
 
     return (
-        <div className="carousel" style={{ position: 'relative', overflow: 'hidden', borderRadius: 'var(--radius-lg)' }}>
-            <div className="embla" ref={emblaRef}>
-                <div className="embla__container" style={{ display: 'flex' }}>
+        <div className="carousel" style={{ position: 'relative', overflow: 'hidden', borderRadius: 'var(--radius-lg)', height: height }}>
+            <div className="embla" ref={emblaRef} style={{ height: '100%' }}>
+                <div className="embla__container" style={{ display: 'flex', height: '100%' }}>
                     {slides.map((slide, index) => (
-                        <div className="embla__slide" key={index} style={{ flex: '0 0 100%', minWidth: 0, position: 'relative' }}>
+                        <div className="embla__slide" key={index} style={{ flex: '0 0 100%', minWidth: 0, position: 'relative', height: '100%' }}>
                             <img
                                 src={slide.image_url}
                                 alt={slide.caption || `Slide ${index + 1}`}
                                 style={{
                                     width: '100%',
-                                    height: '500px',
+                                    height: '100%',
                                     objectFit: 'cover',
                                     display: 'block'
                                 }}

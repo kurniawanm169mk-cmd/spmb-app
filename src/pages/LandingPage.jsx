@@ -64,54 +64,76 @@ export default function LandingPage() {
             <Navbar schoolSettings={schoolSettings} />
 
             <main style={{ flex: 1 }}>
-                {/* Hero Section */}
-                <section className="container" style={{ padding: '4rem 1rem', textAlign: 'center' }}>
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
-                        style={{ marginBottom: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
-                    >
-                        {schoolSettings?.logo_url && (
-                            <motion.img
-                                initial={{ scale: 0.8, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                transition={{ delay: 0.2, duration: 0.5 }}
-                                src={schoolSettings.logo_url}
-                                alt="Logo Sekolah"
-                                style={{ width: '120px', height: '120px', objectFit: 'contain', marginBottom: '1.5rem' }}
-                            />
-                        )}
-                        <h1 style={{ fontSize: '3rem', fontWeight: '800', color: 'var(--primary-color)', marginBottom: '1rem', letterSpacing: '-0.02em' }}>
-                            {schoolSettings?.school_name || 'SMPIT Ibnu Sina'}
-                        </h1>
-                        <p style={{ fontSize: '1.25rem', color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto 2rem' }}>
-                            {schoolSettings?.slogan || 'Generasi Islami, Unggul, Cerdas dan Berakhlak Mulia'}
-                        </p>
+                {/* Hero Section - Full Screen */}
+                <section style={{ position: 'relative', overflow: 'hidden', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {/* Background with Carousel */}
+                    <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+                        <Carousel slides={carouselImages} height="100vh" />
+                    </div>
 
-                        {/* Registration Period */}
-                        {schoolSettings?.registration_start_date && schoolSettings?.registration_end_date && (
+                    {/* Overlay Content */}
+                    <div className="container" style={{ position: 'relative', zIndex: 1, textAlign: 'center', color: 'white', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6 }}
+                            style={{ marginBottom: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+                        >
+                            {schoolSettings?.logo_url && (
+                                <motion.img
+                                    initial={{ scale: 0.8, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    transition={{ delay: 0.2, duration: 0.5 }}
+                                    src={schoolSettings.logo_url}
+                                    alt="Logo Sekolah"
+                                    style={{ width: '120px', height: '120px', objectFit: 'contain', marginBottom: '1.5rem', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.3))' }}
+                                />
+                            )}
+                            <h1 style={{ fontSize: '3.5rem', fontWeight: '800', marginBottom: '1rem', letterSpacing: '-0.02em', color: 'white' }}>
+                                {schoolSettings?.school_name || 'SMPIT Ibnu Sina'}
+                            </h1>
+                            <p style={{ fontSize: '1.5rem', maxWidth: '700px', margin: '0 auto 2rem', color: '#f0fdfa' }}>
+                                {schoolSettings?.slogan || 'Generasi Islami, Unggul, Cerdas dan Berakhlak Mulia'}
+                            </p>
+
+                            {/* Registration Period */}
+                            {schoolSettings?.registration_start_date && schoolSettings?.registration_end_date && (
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ delay: 0.4 }}
+                                    style={{
+                                        padding: '0.75rem 1.5rem',
+                                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                        backdropFilter: 'blur(4px)',
+                                        borderRadius: 'var(--radius-full)',
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem',
+                                        color: 'var(--primary-color)',
+                                        boxShadow: 'var(--shadow-lg)',
+                                        textShadow: 'none'
+                                    }}
+                                >
+                                    <Calendar size={20} />
+                                    <span style={{ fontWeight: 600 }}>
+                                        Pendaftaran: {new Date(schoolSettings.registration_start_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long' })} - {new Date(schoolSettings.registration_end_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                    </span>
+                                </motion.div>
+                            )}
+
                             <motion.div
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: 0.4 }}
-                                style={{ padding: '0.75rem 1.5rem', backgroundColor: '#f0f9ff', borderRadius: 'var(--radius-full)', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: 'var(--primary-color)', border: '1px solid #bae6fd', boxShadow: 'var(--shadow-sm)' }}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.6 }}
+                                style={{ marginTop: '2rem' }}
                             >
-                                <Calendar size={20} />
-                                <span style={{ fontWeight: 600 }}>
-                                    Pendaftaran: {new Date(schoolSettings.registration_start_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long' })} - {new Date(schoolSettings.registration_end_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
-                                </span>
+                                <a href="#info" className="btn btn-primary" style={{ padding: '1rem 2.5rem', fontSize: '1.125rem', textShadow: 'none' }}>
+                                    Selengkapnya
+                                </a>
                             </motion.div>
-                        )}
-                    </motion.div>
-
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.6, duration: 0.6 }}
-                    >
-                        <Carousel slides={carouselImages} />
-                    </motion.div>
+                        </motion.div>
+                    </div>
                 </section>
 
                 {/* Info / Steps Section */}
@@ -222,6 +244,6 @@ export default function LandingPage() {
             </main>
 
             <Footer schoolSettings={schoolSettings} socialMedia={socials} />
-        </div >
+        </div>
     );
 }

@@ -304,6 +304,28 @@ export default function SchoolProfile() {
                         </div>
                     </div>
                 </div>
+
+                <hr style={{ margin: '1.5rem 0', border: 'none', borderTop: '1px solid var(--border-color)' }} />
+
+                <h4 style={{ marginBottom: '1rem', fontSize: '1.125rem' }}>Tipografi</h4>
+                <div>
+                    <label style={{ display: 'block', marginBottom: '0.5rem' }}>Jenis Font</label>
+                    <select
+                        name="font_family"
+                        value={settings.font_family || 'Inter'}
+                        onChange={handleSettingsChange}
+                        className="input"
+                    >
+                        <option value="Inter">Inter (Clean & Professional)</option>
+                        <option value="Poppins">Poppins (Modern & Geometric)</option>
+                        <option value="Nunito">Nunito (Rounded & Friendly)</option>
+                        <option value="Outfit">Outfit (Stylish & Modern)</option>
+                        <option value="DM Serif Display">DM Serif Display (Classic & Elegant)</option>
+                    </select>
+                    <p style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                        Pilih font yang sesuai dengan karakter sekolah Anda.
+                    </p>
+                </div>
             </div>
 
             <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'flex-end' }}>

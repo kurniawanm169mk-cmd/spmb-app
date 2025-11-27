@@ -25,21 +25,29 @@ const ProtectedRoute = ({ children, role }) => {
 
 function App() {
     useEffect(() => {
-        const updateFavicon = async () => {
+        const fetchSettings = async () => {
             try {
-                const { data } = await supabase.from('school_settings').select('logo_url').maybeSingle();
-                if (data?.logo_url) {
-                    const link = document.querySelector("link[rel~='icon']") || document.createElement('link');
-                    link.type = 'image/png';
-                    link.rel = 'icon';
-                    link.href = data.logo_url;
-                    document.getElementsByTagName('head')[0].appendChild(link);
+                const { data } = await supabase.from('school_settings').select('logo_url, font_family').maybeSingle();
+                if (data) {
+                    // Update Favicon
+                    if (data.logo_url) {
+                        const link = document.querySelector("link[rel~='icon']") || document.createElement('link');
+                        link.type = 'image/png';
+                        link.rel = 'icon';
+                        link.href = data.logo_url;
+                        document.getElementsByTagName('head')[0].appendChild(link);
+                    }
+
+                    // Update Font Family
+                    if (data.font_family) {
+                        document.documentElement.style.setProperty('--font-primary', `'${data.font_family}', sans-serif`);
+                    }
                 }
             } catch (error) {
-                console.error('Error updating favicon:', error);
+                console.error('Error fetching settings:', error);
             }
         };
-        updateFavicon();
+        fetchSettings();
     }, []);
 
     return (
