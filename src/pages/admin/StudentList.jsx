@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Search, Filter, Download, CheckCircle, XCircle, Eye, MessageCircle, Trash2, Edit, Plus, UserPlus } from 'lucide-react';
+import { Search, Filter, Download, CheckCircle, XCircle, Eye, MessageCircle, Trash2, Edit, Plus, UserPlus, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
+import { generateStudentPDF } from '../../utils/pdfGenerator';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
+import { Loader2, DownloadCloud } from 'lucide-react';
 
 export default function StudentList() {
     const [students, setStudents] = useState([]);
@@ -14,6 +18,7 @@ export default function StudentList() {
     const [studentForm, setStudentForm] = useState({ full_name: '', email: '', phone: '', password: '' });
     const [signedUrl, setSignedUrl] = useState(null);
     const [docUrls, setDocUrls] = useState({});
+    const [exportLoading, setExportLoading] = useState(false);
 
     useEffect(() => {
         fetchStudents();
@@ -168,6 +173,60 @@ export default function StudentList() {
         return matchesStatus && matchesSearch;
     });
 
+    const handleExportPDF = async (student) => {
+        try {
+            toast.loading('Membuat PDF...');
+            const pdfBlob = await generateStudentPDF(student);
+            saveAs(pdfBlob, `${student.profiles?.full_name.replace(/[^a-z0-9]/gi, '_')}_Docs.pdf`);
+            toast.dismiss();
+            toast.success('PDF Terunduh');
+        } catch (err) {
+            console.error(err);
+            toast.dismiss();
+            toast.error('Gagal membuat PDF');
+        }
+    };
+
+    const handleExportAllPDF = async () => {
+        if (filteredStudents.length === 0) return;
+        if (!confirm(`Export dokumen lengkap untuk ${filteredStudents.length} siswa? Proses ini mungkin memakan waktu.`)) return;
+
+        setExportLoading(true);
+        const zip = new JSZip();
+        let count = 0;
+
+        try {
+            for (const student of filteredStudents) {
+                // Update toast every 5 items to show progress
+                if (count % 5 === 0) toast.loading(`Memproses: ${count}/${filteredStudents.length} siswa...`);
+
+                try {
+                    const pdfBlob = await generateStudentPDF(student);
+                    const fileName = `${student.profiles?.full_name.replace(/[^a-z0-9]/gi, '_')}_${student.id.slice(0, 4)}.pdf`;
+                    zip.file(fileName, pdfBlob);
+                } catch (innerErr) {
+                    console.error(`Failed for ${student.id}:`, innerErr);
+                    zip.file(`ERROR_${student.profiles?.full_name}.txt`, `Failed to generate PDF: ${innerErr.message}`);
+                }
+                count++;
+            }
+
+            toast.dismiss();
+            toast.loading('Mengompres file (ZIP)...');
+            const content = await zip.generateAsync({ type: 'blob' });
+            saveAs(content, `Arsip_Pendaftar_${new Date().toISOString().slice(0, 10)}.zip`);
+
+            toast.dismiss();
+            toast.success('Download ZIP Selesai!');
+        } catch (err) {
+            console.error(err);
+            toast.error('Gagal export ZIP.');
+        } finally {
+            setExportLoading(false);
+            toast.dismiss();
+        }
+    };
+
     const handleExport = () => {
         const dataToExport = filteredStudents.map(s => ({
             Nama: s.profiles?.full_name,
@@ -197,6 +256,10 @@ export default function StudentList() {
                     </button>
                     <button onClick={handleExport} className="btn btn-outline">
                         <Download size={18} /> Export Excel
+                    </button>
+                    <button onClick={handleExportAllPDF} className="btn btn-outline" disabled={exportLoading}>
+                        {exportLoading ? <Loader2 size={18} className="animate-spin" /> : <DownloadCloud size={18} />}
+                        {exportLoading ? ' Processing...' : ' Export Dokumen (ZIP)'}
                     </button>
                 </div>
             </div>
@@ -286,6 +349,7 @@ export default function StudentList() {
                                 </td>
                                 <td style={{ padding: '1rem' }}>
                                     <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <button onClick={() => handleExportPDF(student)} className="btn btn-outline" style={{ padding: '0.25rem 0.5rem' }} title="Download PDF Full"><FileText size={16} /></button>
                                         <button onClick={() => openDetailModal(student)} className="btn btn-outline" style={{ padding: '0.25rem 0.5rem' }} title="Detail"><Eye size={16} /></button>
                                         <button onClick={() => openEditModal(student)} className="btn btn-outline" style={{ padding: '0.25rem 0.5rem' }} title="Edit"><Edit size={16} /></button>
                                         <button onClick={() => {
