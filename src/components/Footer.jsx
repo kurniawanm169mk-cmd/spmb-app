@@ -55,7 +55,17 @@ const Footer = ({ schoolSettings, socialMedia }) => {
                         </div>
                         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                             <Phone size={20} />
-                            <p>{contact_phone}</p>
+                            <a
+                                href={`https://wa.me/${contact_phone.replace(/\D/g, '').replace(/^0/, '62')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ color: 'inherit', textDecoration: 'none', transition: 'color 0.2s' }}
+                                onMouseOver={(e) => e.target.style.color = 'var(--primary-color)'}
+                                onMouseOut={(e) => e.target.style.color = 'inherit'}
+                                title="Chat via WhatsApp"
+                            >
+                                {contact_phone}
+                            </a>
                         </div>
                     </div>
                 </div>
