@@ -34,7 +34,7 @@ export default function StudentDashboard() {
         try {
             const { data, error } = await supabase
                 .from('registrations')
-                .select('*')
+                .select('*, profiles:user_id (full_name, email)')
                 .eq('user_id', user.id)
                 .single();
 
@@ -247,12 +247,8 @@ export default function StudentDashboard() {
                             <FileText size={32} />
                         </div>
                         <h2 style={{ marginBottom: '1rem' }}>Pendaftaran Offline Dipilih</h2>
-                        <p style={{ color: 'var(--text-secondary)', maxWidth: '500px', margin: '0 auto' }}>
-                            Anda memilih metode pendaftaran Offline. Silahkan datang langsung ke sekretariat sekolah untuk mengisi formulir dan menyerahkan berkas fisik.
-                        </p>
-                        <div style={{ marginTop: '1.5rem' }}>
-                            <p style={{ fontWeight: 'bold' }}>Jam Operasional:</p>
-                            <p>Senin - Jumat: 08.00 - 14.00 WITA</p>
+                        <div style={{ color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
+                            {settings?.offline_message || 'Anda memilih metode pendaftaran Offline. Silahkan datang langsung ke sekretariat sekolah.'}
                         </div>
                     </div>
                 ) : (
@@ -298,7 +294,7 @@ const StatusOverview = ({ registration, settings }) => {
             {/* NUDGE BUTTON */}
             {registration.status === 'payment_submitted' && settings?.contact_phone && (
                 <a
-                    href={`https://wa.me/${settings.contact_phone.replace(/^0/, '62')}?text=${encodeURIComponent(`Halo Admin, saya sudah membayar dan upload bukti transfer a/n ${registration.user_id} (Email: ...). Mohon verifikasi.`)}`}
+                    href={`https://wa.me/${settings.contact_phone.replace(/^0/, '62')}?text=${encodeURIComponent(`Halo Admin, saya sudah membayar dan upload bukti transfer.\n\nNama: ${registration.profiles?.full_name || '-'}\nEmail: ${registration.profiles?.email || '-'}\n\nMohon verifikasi.`)}`}
                     target="_blank"
                     rel="noreferrer"
                     className="btn"

@@ -17,7 +17,7 @@ export default function SystemSettings() {
     const fetchData = async () => {
         try {
             // Fetch Dates & Bank Info
-            const { data: settings } = await supabase.from('school_settings').select('id, registration_start_date, registration_end_date, announcement_date, bank_name, bank_account_number, bank_account_holder, registration_fee').maybeSingle();
+            const { data: settings } = await supabase.from('school_settings').select('id, registration_start_date, registration_end_date, announcement_date, bank_name, bank_account_number, bank_account_holder, registration_fee, fullday_description, boarding_description, online_description, offline_description, offline_message').maybeSingle();
             if (settings) {
                 // Format dates for input type="datetime-local"
                 const format = (d) => d ? new Date(d).toISOString().slice(0, 16) : '';
@@ -57,7 +57,12 @@ export default function SystemSettings() {
                     bank_name: dates.bank_name,
                     bank_account_number: dates.bank_account_number,
                     bank_account_holder: dates.bank_account_holder,
-                    registration_fee: dates.registration_fee
+                    registration_fee: dates.registration_fee,
+                    fullday_description: dates.fullday_description,
+                    boarding_description: dates.boarding_description,
+                    online_description: dates.online_description,
+                    offline_description: dates.offline_description,
+                    offline_message: dates.offline_message
                 })
                 .eq('id', dates.id);
 
@@ -217,7 +222,7 @@ export default function SystemSettings() {
                         />
                     </div>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Keterangan Daftar Offline</label>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Keterangan Daftar Offline (Di Toggle)</label>
                         <textarea
                             name="offline_description"
                             value={dates.offline_description || ''}
@@ -225,6 +230,17 @@ export default function SystemSettings() {
                             className="input"
                             rows={2}
                             placeholder="Contoh: Khusus siswa domisili lokal..."
+                        />
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Pesan/Instruksi Mode Offline (Full Page)</label>
+                        <textarea
+                            name="offline_message"
+                            value={dates.offline_message || ''}
+                            onChange={handleDateChange}
+                            className="input"
+                            rows={4}
+                            placeholder="Pesang yang muncul saat siswa memilih offline..."
                         />
                     </div>
                 </div>
