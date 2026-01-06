@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
-import { CreditCard, FileText, Upload, CheckCircle, AlertCircle } from 'lucide-react';
+import { CreditCard, FileText, Upload, CheckCircle, AlertCircle, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import PaymentUpload from './PaymentUpload';
 import RegistrationForm from './RegistrationForm';
@@ -15,9 +15,20 @@ export default function StudentDashboard() {
     const navigate = useNavigate();
     const location = useLocation();
 
+    const [settings, setSettings] = useState(null);
+    const [method, setMethod] = useState('online'); // 'online' | 'offline'
+
     useEffect(() => {
-        if (user) fetchRegistration();
+        if (user) {
+            fetchRegistration();
+            fetchSettings();
+        }
     }, [user]);
+
+    const fetchSettings = async () => {
+        const { data } = await supabase.from('school_settings').select('*').maybeSingle();
+        if (data) setSettings(data);
+    };
 
     const fetchRegistration = async () => {
         try {
@@ -31,11 +42,23 @@ export default function StudentDashboard() {
                 console.error('Error fetching registration:', error);
             } else {
                 setRegistration(data);
+                if (data.registration_method) setMethod(data.registration_method);
             }
         } catch (err) {
             console.error('Unexpected error:', err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const updateMethod = async (newMethod) => {
+        setMethod(newMethod);
+        if (registration) {
+            await supabase.from('registrations').update({ registration_method: newMethod }).eq('id', registration.id);
+            // If switching to offline, maybe we don't need to change status?
+            // If switching to online, we might need to ensure status is appropriate?
+            // For now just update the method preference.
+            fetchRegistration();
         }
     };
 
@@ -108,6 +131,76 @@ export default function StudentDashboard() {
                 </button>
             </div>
 
+            {/* Registration Method Toggle */}
+            <div className="card" style={{ marginBottom: '2rem', padding: '1.5rem' }}>
+                <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>Pilih Metode Pendaftaran</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div
+                        onClick={() => updateMethod('online')}
+                        style={{
+                            border: `2px solid ${method === 'online' ? 'var(--primary-color)' : 'var(--border-color)'}`,
+                            borderRadius: 'var(--radius-md)',
+                            padding: '1rem',
+                            cursor: 'pointer',
+                            backgroundColor: method === 'online' ? '#ecfdf5' : 'white',
+                            transition: 'all 0.2s',
+                            opacity: method === 'online' ? 1 : 0.6
+                        }}
+                    >
+                        <div style={{ fontWeight: 'bold', marginBottom: '0.25rem', color: method === 'online' ? 'var(--primary-color)' : 'inherit', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <Upload size={18} /> Daftar Online
+                        </div>
+                        <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                            {settings?.online_description || 'Isi formulir dan upload berkas secara digital.'}
+                        </p>
+                    </div>
+                    <div
+                        onClick={() => updateMethod('offline')}
+                        style={{
+                            border: `2px solid ${method === 'offline' ? 'var(--primary-color)' : 'var(--border-color)'}`,
+                            borderRadius: 'var(--radius-md)',
+                            padding: '1rem',
+                            cursor: 'pointer',
+                            backgroundColor: method === 'offline' ? '#ecfdf5' : 'white',
+                            transition: 'all 0.2s',
+                            opacity: method === 'offline' ? 1 : 0.6
+                        }}
+                    >
+                        <div style={{ fontWeight: 'bold', marginBottom: '0.25rem', color: method === 'offline' ? 'var(--primary-color)' : 'inherit', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <FileText size={18} /> Daftar Offline (Datang Langsung)
+                        </div>
+                        <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                            {settings?.offline_description || 'Datang ke sekolah untuk pengisian berkas manual.'}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Floating WhatsApp Help Button */}
+            <a
+                href={`https://wa.me/${(settings?.contact_phone || '').replace(/^0/, '62')}?text=${encodeURIComponent('Halo Admin, saya butuh bantuan seputar pendaftaran siswa baru.')}`}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                    position: 'fixed',
+                    bottom: '2rem',
+                    right: '2rem',
+                    backgroundColor: '#25D366',
+                    color: 'white',
+                    width: '60px',
+                    height: '60px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                    zIndex: 50
+                }}
+                title="Hubungi Admin"
+            >
+                <MessageCircle size={32} />
+            </a>
+
             {/* Stepper Navigation */}
             <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1rem', marginBottom: '2rem' }}>
                 {steps.map((step) => {
@@ -148,18 +241,34 @@ export default function StudentDashboard() {
             </div>
 
             <div className="card">
-                <Routes>
-                    <Route path="/" element={<StatusOverview registration={registration} />} />
-                    <Route path="/payment" element={<PaymentUpload registration={registration} onUpdate={fetchRegistration} />} />
-                    <Route path="/form" element={<RegistrationForm registration={registration} onUpdate={fetchRegistration} />} />
-                    <Route path="/documents" element={<DocumentUpload registration={registration} onUpdate={fetchRegistration} />} />
-                </Routes>
+                {method === 'offline' && location.pathname !== '/student' ? (
+                    <div style={{ padding: '2rem', textAlign: 'center' }}>
+                        <div style={{ width: '64px', height: '64px', backgroundColor: '#f1f5f9', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', color: 'var(--text-secondary)' }}>
+                            <FileText size={32} />
+                        </div>
+                        <h2 style={{ marginBottom: '1rem' }}>Pendaftaran Offline Dipilih</h2>
+                        <p style={{ color: 'var(--text-secondary)', maxWidth: '500px', margin: '0 auto' }}>
+                            Anda memilih metode pendaftaran Offline. Silahkan datang langsung ke sekretariat sekolah untuk mengisi formulir dan menyerahkan berkas fisik.
+                        </p>
+                        <div style={{ marginTop: '1.5rem' }}>
+                            <p style={{ fontWeight: 'bold' }}>Jam Operasional:</p>
+                            <p>Senin - Jumat: 08.00 - 14.00 WITA</p>
+                        </div>
+                    </div>
+                ) : (
+                    <Routes>
+                        <Route path="/" element={<StatusOverview registration={registration} settings={settings} />} />
+                        <Route path="/payment" element={<PaymentUpload registration={registration} onUpdate={fetchRegistration} />} />
+                        <Route path="/form" element={<RegistrationForm registration={registration} onUpdate={fetchRegistration} />} />
+                        <Route path="/documents" element={<DocumentUpload registration={registration} onUpdate={fetchRegistration} />} />
+                    </Routes>
+                )}
             </div>
         </div>
     );
 }
 
-const StatusOverview = ({ registration }) => {
+const StatusOverview = ({ registration, settings }) => {
     return (
         <div style={{ textAlign: 'center', padding: '2rem' }}>
             <div style={{ marginBottom: '1.5rem' }}>
@@ -182,9 +291,22 @@ const StatusOverview = ({ registration }) => {
                 {registration.status === 'failed' && 'MOHON MAAF, ANDA BELUM DITERIMA.'}
             </h2>
 
-            <p style={{ color: 'var(--text-secondary)', maxWidth: '500px', margin: '0 auto' }}>
+            <p style={{ color: 'var(--text-secondary)', maxWidth: '500px', margin: '0 auto 1.5rem' }}>
                 Pantau terus halaman ini untuk melihat perkembangan status pendaftaran anda. Pastikan notifikasi WhatsApp anda aktif.
             </p>
+
+            {/* NUDGE BUTTON */}
+            {registration.status === 'payment_submitted' && settings?.contact_phone && (
+                <a
+                    href={`https://wa.me/${settings.contact_phone.replace(/^0/, '62')}?text=${encodeURIComponent(`Halo Admin, saya sudah membayar dan upload bukti transfer a/n ${registration.user_id} (Email: ...). Mohon verifikasi.`)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn"
+                    style={{ backgroundColor: '#25D366', color: 'white', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', border: 'none' }}
+                >
+                    <MessageCircle size={18} /> Hubungi Admin untuk Verifikasi
+                </a>
+            )}
 
             <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }

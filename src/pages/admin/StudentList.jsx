@@ -49,7 +49,8 @@ export default function StudentList() {
         // Generate Signed URL for Payment Proof
         if (student.payment_proof_url) {
             try {
-                const { data } = await supabase.storage.from('private-docs').createSignedUrl(student.payment_proof_url, 3600);
+                // FIX: Used 'payment_proofs' bucket
+                const { data } = await supabase.storage.from('payment_proofs').createSignedUrl(student.payment_proof_url, 3600);
                 if (data) setSignedUrl(data.signedUrl);
             } catch (err) {
                 console.error('Error signing payment proof:', err);
@@ -70,8 +71,6 @@ export default function StudentList() {
             setDocUrls(newDocUrls);
         }
     };
-
-    // ... (keep existing handlers: handleUpdateStatus, sendWhatsApp, handleDelete, CRUD) ...
 
     const handleUpdateStatus = async (id, newStatus) => {
         if (!confirm(`Ubah status menjadi ${newStatus}?`)) return;
@@ -176,7 +175,9 @@ export default function StudentList() {
             Status: s.status,
             'Tanggal Daftar': new Date(s.created_at).toLocaleDateString(),
             'NISN': s.form_data?.nisn || '-',
-            'Asal Sekolah': s.form_data?.origin_school || '-'
+            'Asal Sekolah': s.form_data?.origin_school || '-',
+            'Program': s.boarding_type || '-',
+            'Metode Daftar': s.registration_method || 'Online'
         }));
         const ws = XLSX.utils.json_to_sheet(dataToExport);
         const wb = XLSX.utils.book_new();
@@ -236,6 +237,8 @@ export default function StudentList() {
                         <tr>
                             <th style={{ padding: '1rem', textAlign: 'left' }}>Nama Lengkap</th>
                             <th style={{ padding: '1rem', textAlign: 'left' }}>Email</th>
+                            <th style={{ padding: '1rem', textAlign: 'left' }}>Program</th>
+                            <th style={{ padding: '1rem', textAlign: 'left' }}>Metode</th>
                             <th style={{ padding: '1rem', textAlign: 'left' }}>No HP</th>
                             <th style={{ padding: '1rem', textAlign: 'left' }}>Status</th>
                             <th style={{ padding: '1rem', textAlign: 'left' }}>Aksi</th>
@@ -246,6 +249,23 @@ export default function StudentList() {
                             <tr key={student.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
                                 <td style={{ padding: '1rem' }}>{student.profiles?.full_name}</td>
                                 <td style={{ padding: '1rem' }}>{student.profiles?.email}</td>
+                                <td style={{ padding: '1rem' }}>
+                                    <span style={{ backgroundColor: '#e2e8f0', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.875rem' }}>
+                                        {student.boarding_type || 'Fullday'}
+                                    </span>
+                                </td>
+                                <td style={{ padding: '1rem' }}>
+                                    <span style={{
+                                        backgroundColor: student.registration_method === 'offline' ? '#ffedd5' : '#e0f2fe',
+                                        color: student.registration_method === 'offline' ? '#c2410c' : '#0369a1',
+                                        padding: '0.25rem 0.5rem',
+                                        borderRadius: '4px',
+                                        fontSize: '0.875rem',
+                                        textTransform: 'capitalize'
+                                    }}>
+                                        {student.registration_method || 'Online'}
+                                    </span>
+                                </td>
                                 <td style={{ padding: '1rem' }}>{student.form_data?.parent_phone || '-'}</td>
                                 <td style={{ padding: '1rem' }}>
                                     <span style={{
@@ -299,7 +319,7 @@ Hormat kami, Panitia SPMB SMPIT Ibnu Sina Nunukan`;
                         ))}
                         {filteredStudents.length === 0 && (
                             <tr>
-                                <td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>Tidak ada data siswa.</td>
+                                <td colSpan="6" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>Tidak ada data siswa.</td>
                             </tr>
                         )}
                     </tbody>
@@ -379,11 +399,26 @@ Hormat kami, Panitia SPMB SMPIT Ibnu Sina Nunukan`;
                                                 </div>
                                             </div>
                                         ) : (
-                                            <p style={{ color: 'var(--error)', padding: '1rem', textAlign: 'center' }}>Gagal memuat gambar.</p>
+                                            <p style={{ color: 'var(--error)', padding: '1rem', textAlign: 'center' }}>Gagal memuat gambar (Bucket error atau file tidak ditemukan).</p>
                                         )}
                                     </div>
                                 </div>
                             )}
+
+                            {/* PROGAM CHOICE (NEW) */}
+                            <div>
+                                <h4 style={{ marginBottom: '0.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>Program & Metode</h4>
+                                <div style={{ display: 'flex', gap: '2rem' }}>
+                                    <div>
+                                        <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Program</p>
+                                        <p style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--primary-color)' }}>{selectedStudent.boarding_type || 'Fullday (Default)'}</p>
+                                    </div>
+                                    <div>
+                                        <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Metode Daftar</p>
+                                        <p style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--text-primary)', textTransform: 'capitalize' }}>{selectedStudent.registration_method || 'Online'}</p>
+                                    </div>
+                                </div>
+                            </div>
 
                             {/* Form Data */}
                             <div>

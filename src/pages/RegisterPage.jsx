@@ -3,8 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 import { sendRegistrationEmail } from '../lib/email';
-import { UserPlus, ArrowLeft, Upload, CreditCard, MessageCircle } from 'lucide-react';
+import { UserPlus, ArrowLeft, Upload, CreditCard, MessageCircle, Info } from 'lucide-react';
 import { motion } from 'framer-motion';
+import imageCompression from 'browser-image-compression';
 
 export default function RegisterPage() {
     const [email, setEmail] = useState('');
@@ -67,12 +68,41 @@ export default function RegisterPage() {
             // 2. Upload Payment Proof (if session exists)
             let filePath = null;
             if (session) {
-                const fileExt = paymentFile.name.split('.').pop();
+                let fileToUpload = paymentFile;
+                const isImage = paymentFile.type.startsWith('image/');
+
+                // Compress if image
+                if (isImage) {
+                    try {
+                        const options = {
+                            maxSizeMB: 1, // Max 1MB
+                            maxWidthOrHeight: 1920,
+                            useWebWorker: true,
+                            initialQuality: 0.8
+                        };
+                        fileToUpload = await imageCompression(paymentFile, options);
+                        console.log('Original size:', paymentFile.size / 1024 / 1024, 'MB');
+                        console.log('Compressed size:', fileToUpload.size / 1024 / 1024, 'MB');
+                    } catch (compressionError) {
+                        console.error('Compression failed:', compressionError);
+                        // Continue with original file if compression fails, but warn?
+                    }
+                }
+
+                // Strict Size Validation (2MB)
+                if (fileToUpload.size > 2 * 1024 * 1024) {
+                    // Delete user if upload validation fails to prevent orphaned users? 
+                    //Ideally we should check this BEFORE creating user, but Supabase auth is flexible.
+                    // For now just throw error.
+                    throw new Error('Ukuran file terlalu besar (Maksimal 2MB). Silakan kompress terlebih dahulu.');
+                }
+
+                const fileExt = fileToUpload.name.split('.').pop();
                 const fileName = `${user.id}/payment_proof_${Date.now()}.${fileExt}`;
 
                 const { error: uploadErr } = await supabase.storage
                     .from('payment_proofs')
-                    .upload(fileName, paymentFile);
+                    .upload(fileName, fileToUpload);
 
                 if (uploadErr) throw uploadErr;
                 filePath = fileName;
@@ -245,15 +275,40 @@ Mohon dicek. Terima kasih.`;
 
                     <div style={{ marginTop: '1rem' }}>
                         <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Program Pilihan</label>
-                        <select
-                            className="input"
-                            value={boardingType}
-                            onChange={(e) => setBoardingType(e.target.value)}
-                            required
-                        >
-                            <option value="Fullday">Fullday</option>
-                            <option value="Boarding">Boarding</option>
-                        </select>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <div
+                                onClick={() => setBoardingType('Fullday')}
+                                style={{
+                                    border: `2px solid ${boardingType === 'Fullday' ? 'var(--primary-color)' : 'var(--border-color)'}`,
+                                    borderRadius: 'var(--radius-md)',
+                                    padding: '1rem',
+                                    cursor: 'pointer',
+                                    backgroundColor: boardingType === 'Fullday' ? '#ecfdf5' : 'white',
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                <div style={{ fontWeight: 'bold', marginBottom: '0.25rem', color: boardingType === 'Fullday' ? 'var(--primary-color)' : 'inherit' }}>Fullday</div>
+                                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                    {schoolSettings?.fullday_description || 'Program sekolah sehari penuh.'}
+                                </p>
+                            </div>
+                            <div
+                                onClick={() => setBoardingType('Boarding')}
+                                style={{
+                                    border: `2px solid ${boardingType === 'Boarding' ? 'var(--primary-color)' : 'var(--border-color)'}`,
+                                    borderRadius: 'var(--radius-md)',
+                                    padding: '1rem',
+                                    cursor: 'pointer',
+                                    backgroundColor: boardingType === 'Boarding' ? '#ecfdf5' : 'white',
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                <div style={{ fontWeight: 'bold', marginBottom: '0.25rem', color: boardingType === 'Boarding' ? 'var(--primary-color)' : 'inherit' }}>Boarding</div>
+                                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                    {schoolSettings?.boarding_description || 'Program sekolah dengan asrama.'}
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
                     <hr style={{ margin: '1rem 0', border: 'none', borderTop: '1px solid var(--border-color)' }} />
@@ -320,6 +375,34 @@ Mohon dicek. Terima kasih.`;
                     </div>
                 </div>
             </motion.div>
+
+            {/* Floating WhatsApp Help Button */}
+            <a
+                href={`https://wa.me/${(schoolSettings?.contact_phone || '').replace(/^0/, '62')}?text=${encodeURIComponent('Halo Admin, saya butuh bantuan pendaftaran.')}`}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                    position: 'fixed',
+                    bottom: '2rem',
+                    right: '2rem',
+                    backgroundColor: '#25D366',
+                    color: 'white',
+                    width: '60px',
+                    height: '60px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                    zIndex: 50,
+                    transition: 'transform 0.2s'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                title="Bantuan? Chat Admin"
+            >
+                <MessageCircle size={32} />
+            </a>
         </div>
     );
 

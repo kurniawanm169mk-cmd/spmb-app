@@ -2,18 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Upload, Trash2, FileText, CheckCircle, Eye, File, Image } from 'lucide-react';
 import { toast } from 'sonner';
+import imageCompression from 'browser-image-compression';
 
 export default function DocumentUpload({ registration, onUpdate }) {
     const [documents, setDocuments] = useState([]);
     const [uploading, setUploading] = useState(false);
-
-    // Define required documents
-    const requiredDocs = [
-        { id: 'kk', label: 'Kartu Keluarga (KK)' },
-        { id: 'akta', label: 'Akta Kelahiran' },
-        { id: 'ijazah', label: 'Ijazah / SKL (Jika ada)' },
-        { id: 'foto', label: 'Pas Foto 3x4' }
-    ];
+    const [requiredDocs, setRequiredDocs] = useState([]);
 
     // File validation constants
     const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
@@ -28,8 +22,27 @@ export default function DocumentUpload({ registration, onUpdate }) {
     const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'];
 
     useEffect(() => {
+        fetchConfig();
         fetchDocuments();
     }, []);
+
+    const fetchConfig = async () => {
+        const { data: configData } = await supabase
+            .from('document_config')
+            .select('*')
+            .order('order_index', { ascending: true });
+
+        if (configData && configData.length > 0) {
+            setRequiredDocs(configData.map(d => ({ id: d.document_type, label: d.label, is_required: d.is_required })));
+        } else {
+            setRequiredDocs([
+                { id: 'kk', label: 'Kartu Keluarga (KK)', is_required: true },
+                { id: 'akta', label: 'Akta Kelahiran', is_required: true },
+                { id: 'ijazah', label: 'Ijazah / SKL (Jika ada)', is_required: false },
+                { id: 'foto', label: 'Pas Foto 3x4', is_required: true }
+            ]);
+        }
+    };
 
     const fetchDocuments = async () => {
         const { data } = await supabase
@@ -79,13 +92,39 @@ export default function DocumentUpload({ registration, onUpdate }) {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error('User not found');
 
-            const fileExt = file.name.split('.').pop();
+            let fileToUpload = file;
+            const isImage = file.type.startsWith('image/');
+
+            // Compress if image
+            if (isImage) {
+                try {
+                    const options = {
+                        maxSizeMB: 1, // Max 1MB
+                        maxWidthOrHeight: 1920,
+                        useWebWorker: true,
+                        initialQuality: 0.8
+                    };
+                    const compressedFile = await imageCompression(file, options);
+                    fileToUpload = compressedFile;
+                    console.log('Original size:', file.size / 1024 / 1024, 'MB');
+                    console.log('Compressed size:', compressedFile.size / 1024 / 1024, 'MB');
+                } catch (compressionError) {
+                    console.error('Compression failed:', compressionError);
+                }
+            }
+
+            // Check file size again (post-compression)
+            if (fileToUpload.size > MAX_FILE_SIZE) {
+                throw new Error('Ukuran file terlalu besar (Maksimal 2MB).');
+            }
+
+            const fileExt = fileToUpload.name.split('.').pop();
             const fileName = `${user.id}/${docType}_${Date.now()}.${fileExt}`;
 
             // Upload
             const { error: uploadError } = await supabase.storage
                 .from('private-docs')
-                .upload(fileName, file);
+                .upload(fileName, fileToUpload);
 
             if (uploadError) throw uploadError;
 
@@ -96,8 +135,8 @@ export default function DocumentUpload({ registration, onUpdate }) {
                     registration_id: registration.id,
                     document_type: docType,
                     file_url: fileName,
-                    file_name: file.name,
-                    file_size: file.size
+                    file_name: fileToUpload.name,
+                    file_size: fileToUpload.size
                 }]);
 
             if (dbError) throw dbError;

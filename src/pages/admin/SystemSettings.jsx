@@ -179,6 +179,62 @@ export default function SystemSettings() {
                 </div>
             </div>
 
+            {/* Descriptions Settings */}
+            <div className="card" style={{ marginBottom: '2rem' }}>
+                <h3 style={{ marginBottom: '1.5rem' }}>Keterangan & Informasi</h3>
+                <div style={{ display: 'grid', gap: '1rem' }}>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Deskripsi Program Fullday</label>
+                        <textarea
+                            name="fullday_description"
+                            value={dates.fullday_description || ''}
+                            onChange={handleDateChange}
+                            className="input"
+                            rows={2}
+                            placeholder="Contoh: Program sekolah sehari penuh..."
+                        />
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Deskripsi Program Boarding</label>
+                        <textarea
+                            name="boarding_description"
+                            value={dates.boarding_description || ''}
+                            onChange={handleDateChange}
+                            className="input"
+                            rows={2}
+                            placeholder="Contoh: Program sekolah dengan asrama..."
+                        />
+                    </div>
+                    <div style={{ marginTop: '0.5rem' }}>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Keterangan Daftar Online</label>
+                        <textarea
+                            name="online_description"
+                            value={dates.online_description || ''}
+                            onChange={handleDateChange}
+                            className="input"
+                            rows={2}
+                            placeholder="Contoh: Khusus siswa luar pulau..."
+                        />
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Keterangan Daftar Offline</label>
+                        <textarea
+                            name="offline_description"
+                            value={dates.offline_description || ''}
+                            onChange={handleDateChange}
+                            className="input"
+                            rows={2}
+                            placeholder="Contoh: Khusus siswa domisili lokal..."
+                        />
+                    </div>
+                </div>
+                <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
+                    <button onClick={saveDates} className="btn btn-primary" disabled={savingDates}>
+                        <Save size={18} /> Simpan Keterangan
+                    </button>
+                </div>
+            </div>
+
             {/* Form Builder */}
             <div className="card">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>

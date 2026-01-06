@@ -41,6 +41,18 @@ export default function RegistrationForm({ registration, onUpdate }) {
             }
         } catch (err) {
             console.error('Error fetching form config:', err);
+            // Fallback on error
+            setConfig([
+                { field_name: 'nisn', field_label: 'NISN', field_type: 'number', is_required: true },
+                { field_name: 'full_name', field_label: 'Nama Lengkap', field_type: 'text', is_required: true },
+                { field_name: 'birth_place', field_label: 'Tempat Lahir', field_type: 'text', is_required: true },
+                { field_name: 'birth_date', field_label: 'Tanggal Lahir', field_type: 'date', is_required: true },
+                { field_name: 'gender', field_label: 'Jenis Kelamin', field_type: 'select', options: ['Laki-laki', 'Perempuan'], is_required: true },
+                { field_name: 'origin_school', field_label: 'Asal Sekolah', field_type: 'text', is_required: true },
+                { field_name: 'address', field_label: 'Alamat Lengkap', field_type: 'textarea', is_required: true },
+                { field_name: 'parent_name', field_label: 'Nama Orang Tua/Wali', field_type: 'text', is_required: true },
+                { field_name: 'parent_phone', field_label: 'No HP Orang Tua', field_type: 'tel', is_required: true },
+            ]);
         } finally {
             setLoading(false);
         }
