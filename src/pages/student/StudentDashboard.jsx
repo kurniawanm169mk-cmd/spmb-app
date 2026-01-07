@@ -250,11 +250,58 @@ export default function StudentDashboard() {
                         <div style={{ color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
                             {settings?.offline_message || 'Anda memilih metode pendaftaran Offline. Silahkan datang langsung ke sekretariat sekolah.'}
                         </div>
+
+                        {/* Offline Maps & Images */}
+                        {/* Offline Maps & Images */}
+                        {(settings?.google_maps_url || (settings?.offline_images && settings.offline_images.length > 0)) && (() => {
+                            // Helper to extract src from iframe if user pasted the whole tag
+                            const getMapSrc = (input) => {
+                                if (!input) return null;
+                                if (input.includes('<iframe')) {
+                                    const match = input.match(/src="([^"]+)"/);
+                                    return match ? match[1] : null;
+                                }
+                                return input;
+                            };
+                            const mapSrc = getMapSrc(settings?.google_maps_url);
+
+                            return (
+                                <div style={{ marginTop: '2.5rem', maxWidth: '800px', marginLeft: 'auto', marginRight: 'auto' }}>
+                                    {mapSrc && (
+                                        <div style={{ marginBottom: '2rem', borderRadius: '1rem', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
+                                            <iframe
+                                                src={mapSrc}
+                                                width="100%"
+                                                height="350"
+                                                style={{ border: 0 }}
+                                                allowFullScreen=""
+                                                loading="lazy"
+                                                referrerPolicy="no-referrer-when-downgrade"
+                                                title="Lokasi Sekolah"
+                                            ></iframe>
+                                        </div>
+                                    )}
+
+                                    {settings.offline_images && settings.offline_images.length > 0 && (
+                                        <div>
+                                            <h4 style={{ marginBottom: '1rem', fontWeight: 'bold' }}>Denah & Lokasi Pendaftaran</h4>
+                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem' }}>
+                                                {settings.offline_images.map((img, idx) => (
+                                                    <div key={idx} style={{ borderRadius: '0.5rem', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                                                        <img src={img} alt={`Lokasi ${idx + 1}`} style={{ width: '100%', height: '150px', objectFit: 'cover', cursor: 'pointer' }} onClick={() => window.open(img, '_blank')} />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })()}
                     </div>
                 ) : (
                     <Routes>
                         <Route path="/" element={<StatusOverview registration={registration} settings={settings} />} />
-                        <Route path="/payment" element={<PaymentUpload registration={registration} onUpdate={fetchRegistration} />} />
+                        <Route path="/payment" element={<PaymentUpload registration={registration} settings={settings} onUpdate={fetchRegistration} />} />
                         <Route path="/form" element={<RegistrationForm registration={registration} onUpdate={fetchRegistration} />} />
                         <Route path="/documents" element={<DocumentUpload registration={registration} onUpdate={fetchRegistration} />} />
                     </Routes>

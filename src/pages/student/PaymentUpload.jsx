@@ -3,9 +3,14 @@ import { supabase } from '../../lib/supabase';
 import { Upload, Check } from 'lucide-react';
 import { toast } from 'sonner';
 
-export default function PaymentUpload({ registration, onUpdate }) {
+export default function PaymentUpload({ registration, settings, onUpdate }) {
     const [file, setFile] = useState(null);
     const [uploading, setUploading] = useState(false);
+
+    // Format currency
+    const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount || 0);
+    };
 
     const handleFileChange = (e) => {
         if (e.target.files && e.target.files[0]) {
@@ -31,10 +36,6 @@ export default function PaymentUpload({ registration, onUpdate }) {
                 .upload(filePath, file, { upsert: true });
 
             if (uploadError) throw uploadError;
-
-            // Get Public URL (or signed URL if private)
-            // For private docs, we usually store the path and generate signed URLs on read.
-            // But for simplicity let's assume we store the path.
 
             // Update registration status
             const { error: updateError } = await supabase
@@ -71,10 +72,21 @@ export default function PaymentUpload({ registration, onUpdate }) {
     return (
         <div style={{ maxWidth: '500px', margin: '0 auto' }}>
             <h2 style={{ marginBottom: '1rem' }}>Upload Bukti Pembayaran</h2>
-            <p style={{ marginBottom: '1.5rem', color: 'var(--text-secondary)' }}>
-                Silahkan transfer ke rekening <strong>BSI 1234567890 a.n SMPIT Ibnu Sina</strong> sebesar <strong>Rp 200.000</strong>.
-                Upload foto bukti transfer di bawah ini.
-            </p>
+            <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+                <p style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Silahkan transfer pembayaran pendaftaran ke:</p>
+                <div style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '0.25rem' }}>
+                    {settings?.bank_name || 'Bank ...'} - {settings?.bank_account_number || '...'}
+                </div>
+                <div style={{ fontWeight: '500', marginBottom: '0.75rem' }}>
+                    a.n {settings?.bank_account_holder || '...'}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.75rem', borderTop: '1px solid var(--border-color)' }}>
+                    <span>Nominal:</span>
+                    <span style={{ fontWeight: 'bold', color: 'var(--primary-color)', fontSize: '1.2rem' }}>
+                        {formatCurrency(settings?.registration_fee || 0)}
+                    </span>
+                </div>
+            </div>
 
             <div style={{ border: '2px dashed var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '2rem', textAlign: 'center', marginBottom: '1.5rem' }}>
                 <input

@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Carousel from '../components/Carousel';
+import VideoGallerySection from '../components/VideoGallerySection';
 import { Calendar, CheckCircle, FileText, Upload, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -160,6 +161,9 @@ export default function LandingPage() {
                         </motion.div>
                     </div>
                 </section>
+
+                {/* Video Gallery Section */}
+                <VideoGallerySection />
 
                 {/* Info / Steps Section */}
                 <section id="info" style={{ backgroundColor: 'white', padding: '6rem 0' }}>

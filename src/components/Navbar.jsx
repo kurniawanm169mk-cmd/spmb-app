@@ -4,14 +4,38 @@ import { Menu, X } from 'lucide-react';
 
 const Navbar = ({ schoolSettings }) => {
     const [isOpen, setIsOpen] = React.useState(false);
-    const { school_name = 'SMPIT Ibnu Sina', logo_url } = schoolSettings || {};
+    const {
+        school_name = 'SMPIT Ibnu Sina',
+        logo_url,
+        header_bg_color = '#ffffff', // Default to white hex
+        header_bg_opacity = 0.8,
+        header_text_color = 'var(--primary-color)',
+        header_font_family = 'Inter',
+        header_font_size = '1.25rem',
+        header_font_weight = 'bold',
+        header_letter_spacing = 'normal',
+        header_blur = 10
+    } = schoolSettings || {};
+
+    // Helper to convert hex to rgba
+    const getBgColor = () => {
+        if (!header_bg_color.startsWith('#')) return header_bg_color; // fallback if already rgb/rgba
+        const r = parseInt(header_bg_color.slice(1, 3), 16);
+        const g = parseInt(header_bg_color.slice(3, 5), 16);
+        const b = parseInt(header_bg_color.slice(5, 7), 16);
+        return `rgba(${r}, ${g}, ${b}, ${header_bg_opacity})`;
+    };
 
     return (
         <nav className="glass" style={{
             position: 'sticky',
             top: 0,
             zIndex: 50,
-            borderBottom: '1px solid rgba(255, 255, 255, 0.5)'
+            borderBottom: '1px solid rgba(255, 255, 255, 0.5)',
+            backgroundColor: getBgColor(),
+            backdropFilter: `blur(${header_blur}px)`,
+            WebkitBackdropFilter: `blur(${header_blur}px)`,
+            boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)'
         }}>
             <div className="container" style={{
                 display: 'flex',
@@ -20,7 +44,7 @@ const Navbar = ({ schoolSettings }) => {
                 height: '4.5rem'
             }}>
                 {/* Logo & Brand */}
-                <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
                     {logo_url ? (
                         <img src={logo_url} alt="Logo" style={{ height: '40px', width: 'auto' }} />
                     ) : (
@@ -38,14 +62,20 @@ const Navbar = ({ schoolSettings }) => {
                             IS
                         </div>
                     )}
-                    <span className="header-title" style={{ fontWeight: 'bold', color: 'var(--primary-color)' }}>
+                    <span className="header-title" style={{
+                        color: header_text_color,
+                        fontFamily: header_font_family,
+                        fontSize: header_font_size,
+                        fontWeight: header_font_weight,
+                        letterSpacing: header_letter_spacing
+                    }}>
                         {school_name}
                     </span>
                 </Link>
 
                 {/* Desktop Menu */}
                 <div className="desktop-menu" style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-                    <Link to="/" className="nav-link" style={{ fontWeight: 500, color: 'var(--text-primary)' }}>Beranda</Link>
+                    <Link to="/" className="nav-link" style={{ fontWeight: 500, color: 'var(--text-secondary)' }}>Beranda</Link>
                     <a href="#info" className="nav-link" style={{ fontWeight: 500, color: 'var(--text-secondary)' }}>Informasi</a>
                     <a href="#contact" className="nav-link" style={{ fontWeight: 500, color: 'var(--text-secondary)' }}>Kontak</a>
                     <Link to="/login" className="btn btn-primary" style={{ padding: '0.5rem 1.5rem' }}>
