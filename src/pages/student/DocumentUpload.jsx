@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Upload, Trash2, FileText, CheckCircle, Eye, File, Image } from 'lucide-react';
+import { Upload, Trash2, FileText, CheckCircle, Eye, File, Image, Edit, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import imageCompression from 'browser-image-compression';
+import SmartDocViewer from '../../components/SmartDocViewer';
 
 export default function DocumentUpload({ registration, onUpdate }) {
     const [documents, setDocuments] = useState([]);
     const [uploading, setUploading] = useState(false);
     const [requiredDocs, setRequiredDocs] = useState([]);
+    const [smartTemplates, setSmartTemplates] = useState([]);
+    const [viewingTemplate, setViewingTemplate] = useState(null);
+    const [settings, setSettings] = useState(null); // [NEW]
 
     // File validation constants
     const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
@@ -24,7 +28,14 @@ export default function DocumentUpload({ registration, onUpdate }) {
     useEffect(() => {
         fetchConfig();
         fetchDocuments();
+        fetchSmartTemplates();
+        fetchSettings(); // [NEW]
     }, []);
+
+    const fetchSettings = async () => {
+        const { data } = await supabase.from('school_settings').select('smart_doc_label, smart_doc_description').maybeSingle();
+        if (data) setSettings(data);
+    };
 
     const fetchConfig = async () => {
         const { data: configData } = await supabase
@@ -50,6 +61,29 @@ export default function DocumentUpload({ registration, onUpdate }) {
             .select('*')
             .eq('registration_id', registration.id);
         if (data) setDocuments(data);
+    };
+
+    const fetchSmartTemplates = async () => {
+        if (!registration?.track) return;
+
+        const { data, error } = await supabase
+            .from('document_templates')
+            .select('*')
+            .eq('is_active', true);
+
+        if (error) {
+            console.error('Error fetching templates:', error);
+            return;
+        }
+
+        // Filter templates matching user's track (or NULL = all tracks)
+        const filtered = data.filter(t =>
+            !t.target_tracks ||
+            t.target_tracks.length === 0 ||
+            t.target_tracks.includes(registration.track)
+        );
+
+        setSmartTemplates(filtered);
     };
 
     const validateFile = (file) => {
@@ -288,6 +322,101 @@ export default function DocumentUpload({ registration, onUpdate }) {
                     );
                 })}
             </div>
+
+            {/* SMART DOCUMENTS SECTION */}
+            {smartTemplates.length > 0 && (
+                <div style={{ marginTop: '3rem' }}>
+                    <h2 style={{ marginBottom: '1rem' }}>{settings?.smart_doc_label || 'Dokumen Pintar (Smart Docs)'}</h2>
+                    <p style={{ marginBottom: '1.5rem', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                        {settings?.smart_doc_description || 'Anda dapat mengisi dokumen secara online atau mengunduh template untuk diisi manual.'}
+                    </p>
+
+                    <div style={{ display: 'grid', gap: '1.5rem' }}>
+                        {smartTemplates.map((template) => {
+                            const uploadedDoc = documents.find(d => d.document_type === `smart_${template.id}`);
+
+                            return (
+                                <div key={template.id} className="card" style={{ padding: '1.5rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: uploadedDoc ? '1rem' : 0 }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                            <div style={{ padding: '0.75rem', backgroundColor: uploadedDoc ? '#ecfdf5' : '#f1f5f9', borderRadius: '50%', color: uploadedDoc ? 'var(--success)' : 'var(--primary-color)' }}>
+                                                {uploadedDoc ? <CheckCircle size={24} /> : <FileText size={24} />}
+                                            </div>
+                                            <div>
+                                                <h4 style={{ marginBottom: '0.25rem' }}>{template.title}</h4>
+                                                {uploadedDoc ? (
+                                                    <p style={{ fontSize: '0.875rem', color: 'var(--success)' }}>✓ Sudah diisi</p>
+                                                ) : (
+                                                    <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Belum diisi</p>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                            {uploadedDoc ? (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleViewDocument(uploadedDoc.file_url)}
+                                                        className="btn btn-outline btn-sm"
+                                                        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                                                    >
+                                                        <Eye size={16} /> Lihat
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(uploadedDoc.id, uploadedDoc.file_url)}
+                                                        className="btn btn-outline btn-sm"
+                                                        style={{ color: 'var(--error)', borderColor: 'var(--error)' }}
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {template.template_url && (
+                                                        <a
+                                                            href={template.template_url}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="btn btn-outline btn-sm"
+                                                            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                                                        >
+                                                            <Download size={16} /> Download Format
+                                                        </a>
+                                                    )}
+                                                    <input
+                                                        type="file"
+                                                        id={`upload-smart-${template.id}`}
+                                                        style={{ display: 'none' }}
+                                                        accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+                                                        onChange={(e) => handleUpload(e, `smart_${template.id}`)}
+                                                        disabled={uploading}
+                                                    />
+                                                    <label
+                                                        htmlFor={`upload-smart-${template.id}`}
+                                                        className="btn btn-primary btn-sm"
+                                                        style={{ cursor: uploading ? 'not-allowed' : 'pointer', opacity: uploading ? 0.7 : 1, display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                                                    >
+                                                        <Upload size={16} /> Upload Berkas
+                                                    </label>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {uploadedDoc && (
+                                        <div style={{ paddingTop: '1rem', borderTop: '1px solid var(--border-color)', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                <span>File: {uploadedDoc.file_name || 'N/A'}</span>
+                                                <span>Ukuran: {formatFileSize(uploadedDoc.file_size)}</span>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

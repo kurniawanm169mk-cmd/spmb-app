@@ -31,6 +31,16 @@ export default function RegisterPage() {
         if (data) {
             setSchoolSettings(data);
 
+            // Check Availability for auto-selection
+            const fulldayAvailable = data.allow_fullday_ikhwan !== false || data.allow_fullday_akhwat !== false;
+            const boardingAvailable = data.allow_boarding_ikhwan !== false || data.allow_boarding_akhwat !== false;
+
+            if (!fulldayAvailable && boardingAvailable) {
+                setBoardingType('Boarding');
+            } else if (fulldayAvailable && !boardingAvailable) {
+                setBoardingType('Fullday');
+            }
+
             // Check Dates
             const now = new Date();
             const start = data.registration_start_date ? new Date(data.registration_start_date) : null;
@@ -273,43 +283,53 @@ Mohon dicek. Terima kasih.`;
                         />
                     </div>
 
-                    <div style={{ marginTop: '1rem' }}>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Program Pilihan</label>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                            <div
-                                onClick={() => setBoardingType('Fullday')}
-                                style={{
-                                    border: `2px solid ${boardingType === 'Fullday' ? 'var(--primary-color)' : 'var(--border-color)'}`,
-                                    borderRadius: 'var(--radius-md)',
-                                    padding: '1rem',
-                                    cursor: 'pointer',
-                                    backgroundColor: boardingType === 'Fullday' ? '#ecfdf5' : 'white',
-                                    transition: 'all 0.2s'
-                                }}
-                            >
-                                <div style={{ fontWeight: 'bold', marginBottom: '0.25rem', color: boardingType === 'Fullday' ? 'var(--primary-color)' : 'inherit' }}>Fullday</div>
-                                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                                    {schoolSettings?.fullday_description || 'Program sekolah sehari penuh.'}
-                                </p>
-                            </div>
-                            <div
-                                onClick={() => setBoardingType('Boarding')}
-                                style={{
-                                    border: `2px solid ${boardingType === 'Boarding' ? 'var(--primary-color)' : 'var(--border-color)'}`,
-                                    borderRadius: 'var(--radius-md)',
-                                    padding: '1rem',
-                                    cursor: 'pointer',
-                                    backgroundColor: boardingType === 'Boarding' ? '#ecfdf5' : 'white',
-                                    transition: 'all 0.2s'
-                                }}
-                            >
-                                <div style={{ fontWeight: 'bold', marginBottom: '0.25rem', color: boardingType === 'Boarding' ? 'var(--primary-color)' : 'inherit' }}>Boarding</div>
-                                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                                    {schoolSettings?.boarding_description || 'Program sekolah dengan asrama.'}
-                                </p>
+                    {/* Program Pilihan - Only show if available options exist */}
+                    {(schoolSettings?.allow_fullday_ikhwan !== false || schoolSettings?.allow_fullday_akhwat !== false || schoolSettings?.allow_boarding_ikhwan !== false || schoolSettings?.allow_boarding_akhwat !== false) && (
+                        <div style={{ marginTop: '1rem' }}>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>Program Pilihan (Jalur Pendaftaran)</label>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                {(schoolSettings?.allow_fullday_ikhwan !== false || schoolSettings?.allow_fullday_akhwat !== false) && (
+                                    <div
+                                        onClick={() => setBoardingType('Fullday')}
+                                        style={{
+                                            border: `2px solid ${boardingType === 'Fullday' ? 'var(--primary-color)' : 'var(--border-color)'}`,
+                                            borderRadius: 'var(--radius-md)',
+                                            padding: '1rem',
+                                            cursor: 'pointer',
+                                            backgroundColor: boardingType === 'Fullday' ? '#ecfdf5' : 'white',
+                                            transition: 'all 0.2s',
+                                            opacity: boardingType === 'Fullday' ? 1 : 0.7
+                                        }}
+                                    >
+                                        <div style={{ fontWeight: 'bold', marginBottom: '0.25rem', color: boardingType === 'Fullday' ? 'var(--primary-color)' : 'inherit' }}>Fullday</div>
+                                        <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                            {schoolSettings?.fullday_description || 'Program sekolah sehari penuh.'}
+                                        </p>
+                                    </div>
+                                )}
+
+                                {(schoolSettings?.allow_boarding_ikhwan !== false || schoolSettings?.allow_boarding_akhwat !== false) && (
+                                    <div
+                                        onClick={() => setBoardingType('Boarding')}
+                                        style={{
+                                            border: `2px solid ${boardingType === 'Boarding' ? 'var(--primary-color)' : 'var(--border-color)'}`,
+                                            borderRadius: 'var(--radius-md)',
+                                            padding: '1rem',
+                                            cursor: 'pointer',
+                                            backgroundColor: boardingType === 'Boarding' ? '#ecfdf5' : 'white',
+                                            transition: 'all 0.2s',
+                                            opacity: boardingType === 'Boarding' ? 1 : 0.7
+                                        }}
+                                    >
+                                        <div style={{ fontWeight: 'bold', marginBottom: '0.25rem', color: boardingType === 'Boarding' ? 'var(--primary-color)' : 'inherit' }}>Boarding</div>
+                                        <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                            {schoolSettings?.boarding_description || 'Program sekolah dengan asrama.'}
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         </div>
-                    </div>
+                    )}
 
                     <hr style={{ margin: '1rem 0', border: 'none', borderTop: '1px solid var(--border-color)' }} />
 

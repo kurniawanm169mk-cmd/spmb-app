@@ -17,6 +17,8 @@ export default function StudentDashboard() {
 
     const [settings, setSettings] = useState(null);
     const [method, setMethod] = useState('online'); // 'online' | 'offline'
+    const [savingTrack, setSavingTrack] = useState(false);
+    const [showTrackModal, setShowTrackModal] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -24,6 +26,13 @@ export default function StudentDashboard() {
             fetchSettings();
         }
     }, [user]);
+
+    // Auto-show track modal if track is not set AND not hidden settings
+    useEffect(() => {
+        if (registration && !registration.track && !showTrackModal && settings && !settings.hide_program_in_dashboard) {
+            setShowTrackModal(true);
+        }
+    }, [registration, showTrackModal, settings]);
 
     const fetchSettings = async () => {
         const { data } = await supabase.from('school_settings').select('*').maybeSingle();
@@ -55,10 +64,36 @@ export default function StudentDashboard() {
         setMethod(newMethod);
         if (registration) {
             await supabase.from('registrations').update({ registration_method: newMethod }).eq('id', registration.id);
-            // If switching to offline, maybe we don't need to change status?
-            // If switching to online, we might need to ensure status is appropriate?
-            // For now just update the method preference.
             fetchRegistration();
+        }
+    };
+
+    const handleTrackSelection = async (program, gender) => {
+        if (!program || !gender) {
+            toast.error('Mohon pilih Program dan Jenis Kelamin');
+            return;
+        }
+
+        const genderSuffix = gender === 'Laki-laki' ? 'ikhwan' : 'akhwat';
+        const trackCode = `${program}_${genderSuffix}`;
+
+        setSavingTrack(true);
+        try {
+            const { error } = await supabase
+                .from('registrations')
+                .update({ track: trackCode })
+                .eq('id', registration.id);
+
+            if (error) throw error;
+
+            toast.success('Jalur pendaftaran berhasil disimpan!');
+            setShowTrackModal(false);
+            fetchRegistration();
+        } catch (error) {
+            console.error('Error saving track:', error);
+            toast.error('Gagal menyimpan jalur pendaftaran.');
+        } finally {
+            setSavingTrack(false);
         }
     };
 
@@ -131,8 +166,31 @@ export default function StudentDashboard() {
                 </button>
             </div>
 
-            {/* Registration Method Toggle */}
+            {/* Track Info & Registration Method */}
             <div className="card" style={{ marginBottom: '2rem', padding: '1.5rem' }}>
+                {/* Track Display */}
+                {/* Track Display - Hidden if hide_program_in_dashboard is true */}
+                {registration.track && !settings?.hide_program_in_dashboard && (
+                    <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#f0f9ff', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                            <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Jalur Pendaftaran:</p>
+                            <p style={{ fontWeight: 'bold', color: 'var(--primary-color)' }}>
+                                {registration.track === 'fullday_ikhwan' && 'Fullday School - Ikhwan (Laki-laki)'}
+                                {registration.track === 'fullday_akhwat' && 'Fullday School - Akhwat (Perempuan)'}
+                                {registration.track === 'boarding_ikhwan' && 'Boarding School - Ikhwan (Laki-laki)'}
+                                {registration.track === 'boarding_akhwat' && 'Boarding School - Akhwat (Perempuan)'}
+                            </p>
+                        </div>
+                        <button
+                            onClick={() => setShowTrackModal(true)}
+                            className="btn btn-outline btn-sm"
+                            style={{ fontSize: '0.875rem' }}
+                        >
+                            Ubah Jalur
+                        </button>
+                    </div>
+                )}
+
                 <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>Pilih Metode Pendaftaran</h3>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div
@@ -307,6 +365,16 @@ export default function StudentDashboard() {
                     </Routes>
                 )}
             </div>
+
+            {/* TRACK SELECTION MODAL */}
+            {showTrackModal && (
+                <TrackSelectionModal
+                    onSelect={handleTrackSelection}
+                    saving={savingTrack}
+                    currentTrack={registration.track}
+                    onClose={registration.track ? () => setShowTrackModal(false) : null}
+                />
+            )}
         </div>
     );
 }
@@ -354,6 +422,89 @@ const StatusOverview = ({ registration, settings }) => {
             <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
+        </div>
+    );
+};
+
+const TrackSelectionModal = ({ onSelect, saving, currentTrack, onClose }) => {
+    const [program, setProgram] = useState('');
+    const [gender, setGender] = useState('');
+
+    // Pre-fill if editing existing track
+    useEffect(() => {
+        if (currentTrack) {
+            const [prog, gend] = currentTrack.split('_');
+            setProgram(prog);
+            setGender(gend === 'ikhwan' ? 'Laki-laki' : 'Perempuan');
+        }
+    }, [currentTrack]);
+
+    return (
+        <div style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem'
+        }}>
+            <div className="card" style={{ maxWidth: '500px', width: '90%', padding: '2rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                    <h2 style={{ margin: 0 }}>Pilih Jalur Pendaftaran</h2>
+                    {onClose && (
+                        <button onClick={onClose} className="btn btn-outline" style={{ padding: '0.5rem', minWidth: 'auto' }}>
+                            ✕
+                        </button>
+                    )}
+                </div>
+                <p style={{ textAlign: 'center', color: 'var(--text-secondary)', marginBottom: '2rem' }}>
+                    Tentukan program dan jenis kelamin calon siswa. Anda dapat mengubah pilihan ini kapan saja.
+                </p>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Jenjang / Program</label>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <button
+                                onClick={() => setProgram('fullday')}
+                                className={program === 'fullday' ? 'btn btn-primary' : 'btn btn-outline'}
+                            >
+                                Fullday School
+                            </button>
+                            <button
+                                onClick={() => setProgram('boarding')}
+                                className={program === 'boarding' ? 'btn btn-primary' : 'btn btn-outline'}
+                            >
+                                Boarding School
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Jenis Kelamin Siswa</label>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <button
+                                onClick={() => setGender('Laki-laki')}
+                                className={gender === 'Laki-laki' ? 'btn btn-primary' : 'btn btn-outline'}
+                            >
+                                Laki-laki (Ikhwan)
+                            </button>
+                            <button
+                                onClick={() => setGender('Perempuan')}
+                                className={gender === 'Perempuan' ? 'btn btn-primary' : 'btn btn-outline'}
+                            >
+                                Perempuan (Akhwat)
+                            </button>
+                        </div>
+                    </div>
+
+                    <button
+                        className="btn btn-primary"
+                        style={{ marginTop: '1rem', width: '100%', padding: '1rem' }}
+                        disabled={!program || !gender || saving}
+                        onClick={() => onSelect(program, gender)}
+                    >
+                        {saving ? 'Menyimpan...' : 'Simpan & Lanjutkan'}
+                    </button>
+                </div>
+            </div>
         </div>
     );
 };

@@ -54,9 +54,37 @@ export default function StudentList() {
         // Generate Signed URL for Payment Proof
         if (student.payment_proof_url) {
             try {
-                // FIX: Used 'payment_proofs' bucket
-                const { data } = await supabase.storage.from('payment_proofs').createSignedUrl(student.payment_proof_url, 3600);
-                if (data) setSignedUrl(data.signedUrl);
+                // Determine bucket based on file path or try both
+                // Strategy: Try 'private-docs' first (New standard), then fallback to 'payment_proofs' (Legacy)
+
+                let signedUrlData = null;
+
+                // 1. Try private-docs
+                const { data: dataPrivate } = await supabase.storage
+                    .from('private-docs')
+                    .createSignedUrl(student.payment_proof_url, 3600);
+
+                if (dataPrivate && dataPrivate.signedUrl) {
+                    signedUrlData = dataPrivate.signedUrl;
+                }
+
+                // 2. If valid URL not found, try legacy bucket
+                if (!signedUrlData) {
+                    const { data: dataLegacy } = await supabase.storage
+                        .from('payment_proofs')
+                        .createSignedUrl(student.payment_proof_url, 3600);
+
+                    if (dataLegacy && dataLegacy.signedUrl) {
+                        signedUrlData = dataLegacy.signedUrl;
+                    }
+                }
+
+                if (signedUrlData) {
+                    setSignedUrl(signedUrlData);
+                } else {
+                    console.error('Could not generate signed URL for payment proof - file not found in known buckets');
+                    toast.error('Gagal memuat gambar: File tidak ditemukan di server.');
+                }
             } catch (err) {
                 console.error('Error signing payment proof:', err);
             }

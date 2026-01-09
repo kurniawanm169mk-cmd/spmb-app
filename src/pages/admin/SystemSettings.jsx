@@ -18,7 +18,7 @@ export default function SystemSettings() {
     const fetchData = async () => {
         try {
             // Fetch Dates & Bank Info
-            const { data: settings } = await supabase.from('school_settings').select('id, registration_start_date, registration_end_date, announcement_date, bank_name, bank_account_number, bank_account_holder, registration_fee, fullday_description, boarding_description, online_description, offline_description, offline_message, header_bg_color, header_text_color, header_font_family, header_font_size, header_blur, header_font_weight, header_letter_spacing, header_bg_opacity, google_maps_url, offline_images').maybeSingle();
+            const { data: settings } = await supabase.from('school_settings').select('id, registration_start_date, registration_end_date, announcement_date, bank_name, bank_account_number, bank_account_holder, registration_fee, fullday_description, boarding_description, online_description, offline_description, offline_message, header_bg_color, header_text_color, header_font_family, header_font_size, header_blur, header_font_weight, header_letter_spacing, header_bg_opacity, google_maps_url, offline_images, smart_doc_label, smart_doc_description, allow_fullday_ikhwan, allow_fullday_akhwat, allow_boarding_ikhwan, allow_boarding_akhwat, hide_program_in_dashboard').maybeSingle();
             if (settings) {
                 // Format dates for input type="datetime-local"
                 const format = (d) => d ? new Date(d).toISOString().slice(0, 16) : '';
@@ -78,7 +78,16 @@ export default function SystemSettings() {
                     header_letter_spacing: dates.header_letter_spacing,
                     header_bg_opacity: dates.header_bg_opacity,
                     google_maps_url: dates.google_maps_url,
-                    offline_images: dates.offline_images
+                    offline_images: dates.offline_images,
+                    smart_doc_label: dates.smart_doc_label,
+                    smart_doc_description: dates.smart_doc_description,
+                    smart_doc_label: dates.smart_doc_label,
+                    smart_doc_description: dates.smart_doc_description,
+                    allow_fullday_ikhwan: dates.allow_fullday_ikhwan,
+                    allow_fullday_akhwat: dates.allow_fullday_akhwat,
+                    allow_boarding_ikhwan: dates.allow_boarding_ikhwan,
+                    allow_boarding_akhwat: dates.allow_boarding_akhwat,
+                    hide_program_in_dashboard: dates.hide_program_in_dashboard
                 })
                 .eq('id', dates.id);
 
@@ -187,7 +196,7 @@ export default function SystemSettings() {
 
         let newUrl = item.video_url;
         if (item.type === 'video') {
-            const urlInput = prompt('Edit URL YouTube:', item.video_url);
+            const urlInput = prompt('Edit URL Video (YouTube, TikTok, Instagram, Facebook):', item.video_url);
             if (urlInput === null) return; // Cancelled
             newUrl = urlInput;
         }
@@ -260,7 +269,7 @@ export default function SystemSettings() {
         let image_url = null;
 
         if (type === 'video') {
-            url = prompt('URL YouTube:');
+            url = prompt('URL Video (YouTube, TikTok, Instagram, Facebook):');
             if (!url) return;
         } else {
             // For image, we need an upload input. But using prompt is hard.
@@ -373,6 +382,85 @@ export default function SystemSettings() {
                         <input type="number" name="registration_fee" value={dates.registration_fee || ''} onChange={handleDateChange} className="input" placeholder="Contoh: 150000" />
                     </div>
                 </div>
+                <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
+                    <button onClick={saveDates} className="btn btn-primary" disabled={savingDates}>
+                        <Save size={18} /> Simpan Pengaturan
+                    </button>
+                </div>
+            </div>
+
+            {/* Program Availability Settings */}
+            <div className="card" style={{ marginBottom: '2rem' }}>
+                <h3 style={{ marginBottom: '1.5rem' }}>Pengaturan Program & Kuota</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+
+                    {/* Fullday Settings */}
+                    <div>
+                        <h4 style={{ marginBottom: '1rem', borderBottom: '1px solid #eee', paddingBottom: '0.5rem' }}>Program Fullday</h4>
+                        <div style={{ display: 'grid', gap: '0.5rem' }}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                                <input
+                                    type="checkbox"
+                                    name="allow_fullday_ikhwan"
+                                    checked={dates.allow_fullday_ikhwan !== false}
+                                    onChange={(e) => setDates(prev => ({ ...prev, allow_fullday_ikhwan: e.target.checked }))}
+                                />
+                                Buka untuk Ikhwan (Laki-laki)
+                            </label>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                                <input
+                                    type="checkbox"
+                                    name="allow_fullday_akhwat"
+                                    checked={dates.allow_fullday_akhwat !== false}
+                                    onChange={(e) => setDates(prev => ({ ...prev, allow_fullday_akhwat: e.target.checked }))}
+                                />
+                                Buka untuk Akhwat (Perempuan)
+                            </label>
+                        </div>
+                    </div>
+
+                    {/* Boarding Settings */}
+                    <div>
+                        <h4 style={{ marginBottom: '1rem', borderBottom: '1px solid #eee', paddingBottom: '0.5rem' }}>Program Boarding</h4>
+                        <div style={{ display: 'grid', gap: '0.5rem' }}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                                <input
+                                    type="checkbox"
+                                    name="allow_boarding_ikhwan"
+                                    checked={dates.allow_boarding_ikhwan !== false}
+                                    onChange={(e) => setDates(prev => ({ ...prev, allow_boarding_ikhwan: e.target.checked }))}
+                                />
+                                Buka untuk Ikhwan (Laki-laki)
+                            </label>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                                <input
+                                    type="checkbox"
+                                    name="allow_boarding_akhwat"
+                                    checked={dates.allow_boarding_akhwat !== false}
+                                    onChange={(e) => setDates(prev => ({ ...prev, allow_boarding_akhwat: e.target.checked }))}
+                                />
+                                Buka untuk Akhwat (Perempuan)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Dashboard Visibility */}
+                <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #eee' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontWeight: 500 }}>
+                        <input
+                            type="checkbox"
+                            name="hide_program_in_dashboard"
+                            checked={dates.hide_program_in_dashboard || false}
+                            onChange={(e) => setDates(prev => ({ ...prev, hide_program_in_dashboard: e.target.checked }))}
+                        />
+                        Sembunyikan Pilihan 'Program Pilihan' (Jalur Pendaftaran) di Dashboard Siswa
+                    </label>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginLeft: '1.5rem', marginTop: '0.25rem' }}>
+                        Centang ini untuk menyembunyikan dropdown Fullday/Boarding di formulir biodata siswa (Dashboard), sehingga hanya muncul saat pendaftaran awal.
+                    </p>
+                </div>
+
                 <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
                     <button onClick={saveDates} className="btn btn-primary" disabled={savingDates}>
                         <Save size={18} /> Simpan Pengaturan
@@ -538,6 +626,36 @@ export default function SystemSettings() {
                         </div>
                     </div>
                 </div>
+
+                {/* SMART DOC LABELS */}
+                <div style={{ marginTop: '1rem', borderTop: '1px solid #eee', paddingTop: '1rem' }}>
+                    <h4 style={{ marginBottom: '1rem' }}>Label Dokumen Pintar</h4>
+                    <div style={{ display: 'grid', gap: '1rem' }}>
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Judul / Label</label>
+                            <input
+                                type="text"
+                                name="smart_doc_label"
+                                value={dates.smart_doc_label || ''}
+                                onChange={handleDateChange}
+                                className="input"
+                                placeholder="Default: Dokumen Pintar / Smart Docs"
+                            />
+                        </div>
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Deskripsi / Instruksi</label>
+                            <textarea
+                                name="smart_doc_description"
+                                value={dates.smart_doc_description || ''}
+                                onChange={handleDateChange}
+                                className="input"
+                                rows={2}
+                                placeholder="Default: Anda dapat mengisi dokumen secara online..."
+                            />
+                        </div>
+                    </div>
+                </div>
+
                 <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
                     <button onClick={saveDates} className="btn btn-primary" disabled={savingDates}>
                         <Save size={18} /> Simpan Keterangan
@@ -654,6 +772,6 @@ export default function SystemSettings() {
                     </button>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

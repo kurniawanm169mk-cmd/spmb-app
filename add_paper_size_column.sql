@@ -1,0 +1,2 @@
+ALTER TABLE document_templates 
+ADD COLUMN IF NOT EXISTS paper_size VARCHAR(10) DEFAULT 'A4';

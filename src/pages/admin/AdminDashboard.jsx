@@ -10,6 +10,7 @@ import Typography from './Typography';
 import CTASettings from './CTASettings';
 import RegistrationFlow from './RegistrationFlow';
 import FormCustomization from './FormCustomization';
+import DocumentBuilder from './DocumentBuilder';
 
 export default function AdminDashboard() {
     const { logout } = useAuth();
@@ -26,6 +27,7 @@ export default function AdminDashboard() {
         { path: '/admin/students', label: 'Data Pendaftar', icon: Users },
         { path: '/admin/profile', label: 'Profil Sekolah', icon: Palette },
         { path: '/admin/customization', label: 'Kustomisasi Formulir', icon: FileText },
+        { path: '/admin/documents', label: 'Smart Docs', icon: FileText },
         { path: '/admin/typography', label: 'Tipografi', icon: Type },
         { path: '/admin/cta-settings', label: 'CTA Section', icon: Image },
         { path: '/admin/registration-flow', label: 'Alur Pendaftaran', icon: ListOrdered },
@@ -103,6 +105,7 @@ export default function AdminDashboard() {
                     <Route path="/cta-settings" element={<CTASettings />} />
                     <Route path="/registration-flow" element={<RegistrationFlow />} />
                     <Route path="/customization" element={<FormCustomization />} />
+                    <Route path="/documents" element={<DocumentBuilder />} />
                     <Route path="/settings" element={<SystemSettings />} />
                 </Routes>
             </main>

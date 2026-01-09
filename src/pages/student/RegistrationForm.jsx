@@ -10,9 +10,17 @@ export default function RegistrationForm({ registration, onUpdate }) {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
+    const [settings, setSettings] = useState(null);
+
     useEffect(() => {
         fetchConfig();
+        fetchSettings();
     }, []);
+
+    const fetchSettings = async () => {
+        const { data } = await supabase.from('school_settings').select('*').maybeSingle();
+        if (data) setSettings(data);
+    };
 
     const fetchConfig = async () => {
         try {
@@ -105,9 +113,34 @@ export default function RegistrationForm({ registration, onUpdate }) {
                         className="input"
                         required
                     >
-                        <option value="Fullday">Fullday</option>
-                        <option value="Boarding">Boarding</option>
+                        {/* Logic to show options based on Gender */}
+                        {(() => {
+                            const gender = formData.gender; // Assumes 'gender' field exists
+                            const isIkhwan = gender === 'Laki-laki';
+                            const isAkhwat = gender === 'Perempuan';
+                            const noGender = !gender;
+
+                            const showFullday = noGender ||
+                                (isIkhwan && settings?.allow_fullday_ikhwan !== false) ||
+                                (isAkhwat && settings?.allow_fullday_akhwat !== false);
+
+                            const showBoarding = noGender ||
+                                (isIkhwan && settings?.allow_boarding_ikhwan !== false) ||
+                                (isAkhwat && settings?.allow_boarding_akhwat !== false);
+
+                            return (
+                                <>
+                                    {showFullday && <option value="Fullday">Fullday</option>}
+                                    {showBoarding && <option value="Boarding">Boarding</option>}
+                                </>
+                            );
+                        })()}
                     </select>
+                    {formData.gender && (
+                        <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
+                            * Pilihan program disesuaikan dengan jenis kelamin.
+                        </p>
+                    )}
                 </div>
 
                 {config.map((field) => (

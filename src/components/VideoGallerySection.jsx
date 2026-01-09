@@ -23,12 +23,88 @@ export default function VideoGallerySection() {
         fetchItems();
     }, []);
 
-    // Helper to extract YouTube ID
-    const getYouTubeId = (url) => {
+    // Helper to get Embed URL or Component
+    const renderVideoEmbed = (url, title) => {
         if (!url) return null;
-        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-        const match = url.match(regExp);
-        return (match && match[2].length === 11) ? match[2] : null;
+
+        // 1. YouTube
+        const ytRegExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+        const ytMatch = url.match(ytRegExp);
+        if (ytMatch && ytMatch[2].length === 11) {
+            return (
+                <iframe
+                    src={`https://www.youtube.com/embed/${ytMatch[2]}`}
+                    title={title}
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                />
+            );
+        }
+
+        // 2. Facebook
+        if (url.includes('facebook.com') || url.includes('fb.watch')) {
+            // FB requires encoded URL in the src
+            const encodedUrl = encodeURIComponent(url);
+            return (
+                <iframe
+                    src={`https://www.facebook.com/plugins/video.php?href=${encodedUrl}&show_text=false&t=0`}
+                    title={title}
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none', overflow: 'hidden' }}
+                    scrolling="no"
+                    frameBorder="0"
+                    allowFullScreen={true}
+                    allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                />
+            );
+        }
+
+        // 3. Instagram
+        if (url.includes('instagram.com')) {
+            // Add /embed to the URL if not present
+            // Remove query params first
+            let cleanUrl = url.split('?')[0];
+            if (!cleanUrl.endsWith('/')) cleanUrl += '/';
+            if (!cleanUrl.endsWith('embed/') && !cleanUrl.endsWith('embed')) cleanUrl += 'embed';
+
+            return (
+                <iframe
+                    src={cleanUrl}
+                    title={title}
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none', overflow: 'hidden' }}
+                    scrolling="no"
+                    frameBorder="0"
+                    allowFullScreen={true}
+                />
+            );
+        }
+
+        // 4. TikTok
+        if (url.includes('tiktok.com')) {
+            // Extract Video ID
+            // Pattern: https://www.tiktok.com/@user/video/723...
+            const tiktokMatch = url.match(/video\/(\d+)/);
+            if (tiktokMatch && tiktokMatch[1]) {
+                return (
+                    <iframe
+                        src={`https://www.tiktok.com/embed/v2/${tiktokMatch[1]}?lang=en-US`}
+                        title={title}
+                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
+                        allowFullScreen
+                        scrolling="no"
+                    />
+                );
+            }
+        }
+
+        // Fallback or Unknown
+        return (
+            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#000', color: 'white', padding: '1rem', textAlign: 'center' }}>
+                <a href={url} target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'underline' }}>
+                    Tonton Video di Sumber Asli
+                </a>
+            </div>
+        );
     };
 
     if (loading) return null;
@@ -77,20 +153,7 @@ export default function VideoGallerySection() {
                                             }}
                                         />
                                     ) : (
-                                        <iframe
-                                            src={`https://www.youtube.com/embed/${getYouTubeId(item.video_url)}`}
-                                            title={item.title}
-                                            style={{
-                                                position: 'absolute',
-                                                top: 0,
-                                                left: 0,
-                                                width: '100%',
-                                                height: '100%',
-                                                border: 'none'
-                                            }}
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                            allowFullScreen
-                                        />
+                                        renderVideoEmbed(item.video_url, item.title)
                                     )}
                                 </div>
                                 <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
