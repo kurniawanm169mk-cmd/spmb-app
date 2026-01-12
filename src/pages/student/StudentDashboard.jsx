@@ -9,16 +9,28 @@ import RegistrationForm from './RegistrationForm';
 import DocumentUpload from './DocumentUpload';
 
 export default function StudentDashboard() {
-    const { user, logout } = useAuth();
+    const { user, logout, profile } = useAuth();
     const [registration, setRegistration] = useState(null);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const location = useLocation();
+    const welcomeShownRef = React.useRef(false);
 
     const [settings, setSettings] = useState(null);
     const [method, setMethod] = useState('online'); // 'online' | 'offline'
     const [savingTrack, setSavingTrack] = useState(false);
     const [showTrackModal, setShowTrackModal] = useState(false);
+
+    useEffect(() => {
+        if (profile?.full_name && !welcomeShownRef.current) {
+            toast.success(`Selamat datang, ${profile.full_name}! 👋`, {
+                duration: 4000,
+            });
+            welcomeShownRef.current = true;
+        }
+    }, [profile]);
+
+
 
     useEffect(() => {
         if (user) {
