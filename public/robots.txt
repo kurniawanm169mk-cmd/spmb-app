@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ibnusinaspmb.vercel.app/sitemap.xml
+Sitemap: https://spmb-smpit-ibnusina-nunukan.vercel.app/sitemap.xml
