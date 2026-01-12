@@ -163,7 +163,7 @@ export default function LandingPage() {
                 </section>
 
                 {/* Video Gallery Section */}
-                <VideoGallerySection />
+                <VideoGallerySection schoolSettings={schoolSettings} />
 
                 {/* Info / Steps Section */}
                 <section id="info" style={{ backgroundColor: 'white', padding: '6rem 0' }}>

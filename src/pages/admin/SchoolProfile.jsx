@@ -253,6 +253,17 @@ export default function SchoolProfile() {
                         <label style={{ display: 'block', marginBottom: '0.5rem' }}>Deskripsi CTA (Halaman Depan)</label>
                         <textarea name="cta_description" value={settings.cta_description || ''} onChange={handleSettingsChange} className="input" rows={3} placeholder="Pendaftaran Tahun Ajaran Baru Telah Dibuka..." />
                     </div>
+
+                    <hr style={{ margin: '1rem 0', border: 'none', borderTop: '1px solid var(--border-color)' }} />
+
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Judul Galeri (Halaman Depan)</label>
+                        <input type="text" name="gallery_title" value={settings.gallery_title || ''} onChange={handleSettingsChange} className="input" placeholder="Galeri Kegiatan" />
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Deskripsi Galeri (Halaman Depan)</label>
+                        <textarea name="gallery_description" value={settings.gallery_description || ''} onChange={handleSettingsChange} className="input" rows={2} placeholder="Dokumentasi kegiatan dan profil sekolah kami" />
+                    </div>
                 </div>
             </div>
 
