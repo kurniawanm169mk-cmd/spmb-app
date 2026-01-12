@@ -242,6 +242,20 @@ export default function SchoolProfile() {
                         <label style={{ display: 'block', marginBottom: '0.5rem' }}>Google Maps URL (Embed)</label>
                         <input type="text" name="google_maps_url" value={settings.google_maps_url || ''} onChange={handleSettingsChange} className="input" placeholder="https://www.google.com/maps/embed?..." />
                     </div>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Nomor WhatsApp (Admin)</label>
+                        <input type="text" name="whatsapp_number" value={settings.whatsapp_number || ''} onChange={handleSettingsChange} className="input" placeholder="628123456789" />
+                        <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>Format: 628xxxxxxxxxx (tanpa tanda +)</p>
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Teks Tombol WhatsApp</label>
+                        <input type="text" name="whatsapp_button_text" value={settings.whatsapp_button_text || ''} onChange={handleSettingsChange} className="input" placeholder="Informasi lebih lanjut, hubungi panitia" />
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Pesan Otomatis WhatsApp</label>
+                        <textarea name="whatsapp_message" value={settings.whatsapp_message || ''} onChange={handleSettingsChange} className="input" rows={3} placeholder="Halo, saya ingin menanyakan informasi lebih lanjut tentang pendaftaran." />
+                        <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>Pesan ini akan otomatis muncul saat user klik tombol WhatsApp</p>
+                    </div>
 
                     <hr style={{ margin: '1rem 0', border: 'none', borderTop: '1px solid var(--border-color)' }} />
 

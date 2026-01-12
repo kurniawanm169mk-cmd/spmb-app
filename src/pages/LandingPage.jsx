@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Carousel from '../components/Carousel';
 import VideoGallerySection from '../components/VideoGallerySection';
+import FloatingWhatsApp from '../components/FloatingWhatsApp';
 import { Calendar, CheckCircle, FileText, Upload, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -223,6 +224,11 @@ export default function LandingPage() {
                 </section>
             </main>
 
+            <FloatingWhatsApp
+                phoneNumber={schoolSettings?.whatsapp_number}
+                buttonText={schoolSettings?.whatsapp_button_text}
+                message={schoolSettings?.whatsapp_message}
+            />
             <Footer schoolSettings={schoolSettings} socialMedia={socials} />
         </div>
     );
